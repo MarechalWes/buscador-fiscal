@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localizador Fiscal IBGE, CFOP & De-Para Impostos</title>
+  <style>
+    :root[data-theme="dark"] {
+      --bg-main: #070d0a;
+      --bg-card: #0f1913;
+      --bg-item: #0b130e;
+      --bg-item-hover: #16251c;
+      --bg-input: #060b08;
+      --border: #1a2f22;
+      --border-focus: #00c853;
+      --text: #f0fdf4;
+      --text-title: #ffffff;
+      --text-muted: #86a392;
+      --text-sep: #4e6b58;
+      --brand-green: #00c853;
+      --brand-green-hover: #00e676;
+      --brand-green-glow: rgba(0, 200, 83, 0.18);
+      --origem: #00e676;
+      --destino: #f59e0b;
+      --danger: #ef4444;
+      --success: #00c853;
+      --tag-uf-bg: #0f1c13;
+      --tag-uf-border: #1a2f22;
+      --tag-uf-text: #fbbf24;
+      --scrollbar-thumb: #1a2f22;
+      --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.4);
+      --chip-cfop-bg: #14241a;
+      --chip-cfop-border: #233b2c;
+      --desc-box-bg: #0a140f;
+    }
+    :root[data-theme="light"] {
+      --bg-main: #f3f7f4;
+      --bg-card: #ffffff;
+      --bg-item: #f8faf9;
+      --bg-item-hover: #eaf5ed;
+      --bg-input: #ffffff;
+      --border: #cfe0d5;
+      --border-focus: #008f39;
+      --text: #17261d;
+      --text-title: #09150e;
+      --text-muted: #567261;
+      --text-sep: #9bb1a3;
+      --brand-green: #008f39;
+      --brand-green-hover: #006d2c;
+      --brand-green-glow: rgba(0, 143, 57, 0.15);
+      --origem: #008f39;
+      --destino: #b45309;
+      --danger: #dc2626;
+      --success: #15803d;
+      --tag-uf-bg: #fef3c7;
+      --tag-uf-border: #fde68a;
+      --tag-uf-text: #b45309;
+      --scrollbar-thumb: #c4d7cb;
+      --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.06);
+      --chip-cfop-bg: #eaf5ed;
+      --chip-cfop-border: #cfe0d5;
+      --desc-box-bg: #f0f7f2;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
+    .container { max-width: 1250px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .header-titles h1 { font-size: 1.4rem; margin: 0 0 4px 0; color: var(--text-title); font-weight: 700; }
+    .header-titles h1 span { color: var(--brand-green); }
+    .header-titles p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .btn-global-toggle { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-title); padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-global-toggle:hover { border-color: var(--brand-green); background: var(--bg-item-hover); }
+
+    .status-badge { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; }
+    .status-dot { width: 9px; height: 9px; border-radius: 50%; background: #eab308; }
+    .status-dot.ready { background: var(--brand-green); box-shadow: 0 0 10px var(--brand-green); }
+
+    .btn-theme { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-theme:hover { border-color: var(--brand-green); }
+
+    .top-controls { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+    @media (max-width: 900px) { .top-controls { grid-template-columns: 1fr; } }
+
+    .format-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .control-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .format-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 0.76rem; cursor: pointer; font-weight: 600; }
+    .pill.active { background: var(--brand-green-glow); color: var(--brand-green-hover); border-color: var(--brand-green); }
+
+    .favorites-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 44px; }
+    .fav-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .fav-chip { background: var(--bg-input); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 0.76rem; color: var(--text); display: flex; align-items: center; gap: 6px; }
+    .fav-btn-send { font-size: 0.68rem; padding: 2px 4px; border-radius: 3px; font-weight: bold; cursor: pointer; }
+    .fav-btn-send.ori { background: rgba(0, 200, 83, 0.2); color: var(--origem); }
+    .fav-btn-send.des { background: rgba(245, 158, 11, 0.2); color: var(--destino); }
+    .fav-chip-del { color: #64748b; margin-left: 2px; cursor: pointer; }
+
+    .module-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
+    .module-title { font-size: 1.05rem; font-weight: 700; color: var(--text-title); display: flex; align-items: center; gap: 8px; }
+    .module-title span { color: var(--brand-green); }
+    .module-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .btn-add-slot { background: #008f39; border: 1px solid #008f39; color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+    .btn-add-slot:hover { background: #00c853; color: #000; }
+    .btn-toggle-module { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+    .btn-remove-slot { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 4px 10px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+
+    .ibge-module-card, .cfop-module-card, .depara-card, .key-parser-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px;
+    }
+
+    .grid-search { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 840px) { .grid-search { grid-template-columns: 1fr; } }
+    .card { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .card-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-title); }
+    .badge { padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .badge-origem { background: rgba(0, 200, 83, 0.18); color: var(--brand-green-hover); border: 1px solid rgba(0, 200, 83, 0.35); }
+    .badge-destino { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .btn-clear-card { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 5px; font-size: 0.72rem; cursor: pointer; }
+
+    .search-row { display: flex; gap: 8px; margin-bottom: 4px; }
+    input[type="text"] { background: var(--bg-input); border: 1.5px solid var(--border); color: var(--text-title); padding: 10px 14px; border-radius: 8px; font-size: 0.92rem; outline: none; }
+    input[type="text"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--brand-green-glow); }
+    .input-cidade { flex: 1; }
+    .input-uf { width: 70px; text-align: center; text-transform: uppercase; font-weight: 700; }
+    .search-hint { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
+
+    .results-box { flex: 1; height: 240px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+    .item-card { background: var(--bg-item); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .item-card:hover, .item-card.keyboard-active { background: var(--bg-item-hover) !important; border-color: var(--brand-green) !important; }
+    .item-card.copied { background: rgba(0, 200, 83, 0.18) !important; border-color: var(--brand-green) !important; }
+    .lbl-ibge { color: var(--text-muted); font-size: 0.8rem; }
+    .val-ibge { color: var(--brand-green); font-weight: 700; font-family: Consolas, monospace; }
+    .val-cidade { color: var(--text-title); font-weight: 600; }
+    .val-uf { color: var(--tag-uf-text); font-weight: 700; background: var(--tag-uf-bg); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--tag-uf-border); font-size: 0.76rem; }
+    .feedback-badge { display: none; font-size: 0.7rem; font-weight: 700; color: var(--brand-green-hover); background: rgba(0, 200, 83, 0.2); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+    .item-card.copied .feedback-badge, .route-box-clickable.copied .feedback-badge, .key-chip-result.copied .feedback-badge { display: block; }
+
+    .route-panel { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+    .route-display { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .route-box-clickable { background: var(--bg-card); border: 1.5px solid var(--border); padding: 10px 14px; border-radius: 8px; flex: 1; min-width: 240px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .route-box-clickable:hover { background: var(--bg-item-hover); border-color: var(--brand-green); }
+    .route-box-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; }
+    .route-box-label.ori { color: var(--origem); }
+    .route-box-label.des { color: var(--destino); }
+    .route-box-val { font-size: 0.95rem; font-weight: 700; color: var(--text-title); margin-top: 3px; font-family: Consolas, monospace; }
+    .btn-action { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-title); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
+    .btn-action:hover { background: var(--brand-green); color: #fff; }
+    .fiscal-diag-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
+    .fiscal-diag { flex: 1; min-width: 260px; padding: 10px 16px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; }
+    .fiscal-diag.interna { background: rgba(0, 200, 83, 0.15); color: var(--brand-green-hover); border-color: rgba(0, 200, 83, 0.35); }
+    .fiscal-diag.interestadual { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+    .fiscal-diag.pendente { background: var(--bg-card); color: var(--text-muted); border-color: var(--border); }
+    .aliquota-tag { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 0.84rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .aliquota-val { color: var(--brand-green); font-size: 0.95rem; }
+
+    .cfop-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px; }
+    .cfop-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+    .cfop-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; }
+    .cfop-title.nfe { color: #38bdf8; }
+    .cfop-title.cte { color: #fbbf24; }
+    .cfop-title.custom { color: var(--brand-green); }
+    .cfop-input-group { display: flex; gap: 8px; align-items: center; }
+    .cfop-input-manual { width: 110px; padding: 7px 10px; font-size: 1.05rem; font-weight: 800; font-family: Consolas, monospace; text-align: center; border-radius: 6px; }
+    .btn-copy-cfop-manual { background: var(--bg-item-hover); border: 1px solid var(--border); color: var(--text-title); padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-copy-cfop-manual:hover { background: var(--brand-green); color: #000; }
+    .cfop-desc-box { background: var(--desc-box-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 0.76rem; color: var(--text); line-height: 1.35; min-height: 48px; display: flex; align-items: center; }
+    .cfop-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cfop-chip { background: var(--chip-cfop-bg); border: 1px solid var(--chip-cfop-border); color: var(--text-title); padding: 4px 8px; border-radius: 5px; font-size: 0.74rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .cfop-chip strong { color: var(--brand-green); font-family: Consolas, monospace; }
+
+    .depara-slot, .key-slot { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .depara-slot-header, .key-slot-header { display: flex; justify-content: space-between; align-items: center; }
+    .depara-slot-title, .key-slot-title { font-size: 0.82rem; font-weight: 800; color: var(--brand-green); text-transform: uppercase; }
+    .input-depara { flex: 1; font-family: Consolas, monospace; font-size: 1rem; font-weight: 700; text-transform: uppercase; }
+    
+    .depara-matches-container {
+      display: none; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 160px; overflow-y: auto; padding: 6px; flex-direction: column; gap: 4px;
+    }
+    .depara-match-row {
+      display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: background 0.15s;
+    }
+    .depara-match-row:hover { background: var(--bg-item-hover); border-color: var(--brand-green); }
+
+    .depara-result-box { background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .depara-main-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .depara-badge-old { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; padding: 6px 12px; border-radius: 6px; font-family: Consolas, monospace; font-weight: 800; font-size: 1.1rem; }
+    .depara-badge-new { background: rgba(0, 200, 83, 0.2); border: 1.5px solid var(--brand-green); color: var(--brand-green-hover); padding: 6px 14px; border-radius: 6px; font-family: Consolas, monospace; font-weight: 800; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .depara-badge-new:hover { background: var(--brand-green); color: #000; }
+    .depara-desc-title { font-size: 0.88rem; font-weight: 700; color: var(--text-title); line-height: 1.35; }
+    .depara-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+    .depara-detail-item { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; gap: 2px; }
+    .depara-detail-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+    .depara-detail-val { font-size: 0.82rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; }
+
+    .key-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .input-key { flex: 1; min-width: 280px; font-family: Consolas, monospace; font-size: 0.95rem; }
+    .btn-sefaz-consult { background: #008f39; border: 1px solid #008f39; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-sefaz-consult:hover { background: #00c853; color: #000; }
+    .btn-key-clear { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    .key-grid-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+    .key-chip-result { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; cursor: pointer; position: relative; }
+    .key-chip-result:hover { border-color: var(--brand-green); background: var(--bg-item-hover); }
+    .key-chip-full { grid-column: 1 / -1; border-color: rgba(0, 200, 83, 0.35); background: rgba(0, 200, 83, 0.04); }
+    .key-chip-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; }
+    .key-chip-val { font-size: 0.92rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; word-break: break-all; }
+    .key-chip-val.highlight { color: var(--brand-green); }
+    .empty-state { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; padding: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-titles">
+      <h1>Localizador Fiscal IBGE, CFOP & De-Para Impostos <span>&bull;</span></h1>
+      <p>Localizador de municípios, alíquotas, CFOPs, desmembrador de chaves e conversor de códigos de imposto</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-global-toggle" onclick="recolherTodosModulos()" title="Recolher todos os blocos">➖ Recolher Tudo</button>
+      <button class="btn-global-toggle" onclick="expandirTodosModulos()" title="Expandir todos os blocos">➕ Expandir Tudo</button>
+      <button class="btn-theme" id="btnTheme" onclick="alternarTema()" title="Alternar entre Modo Escuro e Claro">
+        <span id="themeIcon">☀️</span> <span id="themeLabel">Modo Claro</span>
+      </button>
+      <div class="status-badge">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Carregando municípios...</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="offlineBanner" class="offline-banner">
+    <span>⚠️ <strong>Modo Offline Ativo:</strong> Usando base local interna. Para sincronizar os 5.570 municípios do IBGE conecte à internet e clique em Tentar Novamente.</span>
+    <button onclick="carregarBaseIBGE(true)">Tentar Novamente</button>
+  </div>
+
+  <div class="top-controls">
+    <div class="format-bar">
+      <span class="control-label">Formato:</span>
+      <div class="format-pills">
+        <div class="pill active" onclick="setFormato('codigo', this)">Apenas Código</div>
+        <div class="pill" onclick="setFormato('cidade_uf', this)">Cidade - UF</div>
+        <div class="pill" onclick="setFormato('padrao_fiscal', this)">Padrão Fiscal</div>
+        <div class="pill" onclick="setFormato('xml', this)">Tag &lt;cMun&gt;</div>
+      </div>
+    </div>
+    <div class="favorites-bar">
+      <span class="control-label">★ Favoritos:</span>
+      <div class="fav-chips" id="favChipsContainer"></div>
+    </div>
+  </div>
+
+  <!-- 1. LOCALIZADOR IBGE & ROTAS -->
+  <div class="ibge-module-card">
+    <div class="module-header">
+      <div class="module-title">📍 Localizador Fiscal IBGE & Rotas <span>(Origem / Destino)</span></div>
+      <div class="module-actions">
+        <button class="btn-toggle-module" id="btnToggleIbge" onclick="alternarModulo('ibgeBody', 'btnToggleIbge', 'ibge_col')">➖ Recolher Módulo</button>
+      </div>
+    </div>
+    <div id="ibgeBody" style="display:flex; flex-direction:column; gap:14px;">
+      <div class="grid-search">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Município de Origem</h2>
+            <button class="btn-clear-card" onclick="limparCard('origem')">Limpar</button>
+          </div>
+          <div class="search-row">
+            <input type="text" id="cidadeOrigem" class="input-cidade" placeholder="Cidade (ex: Campo Grande, Corumbá, Cascavel)..." oninput="filtrar('origem')" onkeydown="checarTeclas(event, 'origem')" autofocus>
+            <input type="text" id="ufOrigem" class="input-uf" placeholder="UF" maxlength="2" oninput="filtrar('origem')" onkeydown="checarTeclas(event, 'origem')">
+          </div>
+          <div class="search-hint">💡 [↑ / ↓] navega &bull; [Enter] seleciona &bull; [Tab] pula p/ Destino &bull; [Esc] limpa</div>
+          <div class="results-box" id="resOrigem"><div class="empty-state">Digite o nome da cidade ou UF acima.</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Município de Destino</h2>
+            <button class="btn-clear-card" onclick="limparCard('destino')">Limpar</button>
+          </div>
+          <div class="search-row">
+            <input type="text" id="cidadeDestino" class="input-cidade" placeholder="Cidade (ex: São Paulo, Santos, Santarém)..." oninput="filtrar('destino')" onkeydown="checarTeclas(event, 'destino')">
+            <input type="text" id="ufDestino" class="input-uf" placeholder="UF" maxlength="2" oninput="filtrar('destino')" onkeydown="checarTeclas(event, 'destino')">
+          </div>
+          <div class="search-hint">💡 [↑ / ↓] navega &bull; [Enter] seleciona e copia &bull; [Esc] limpa</div>
+          <div class="results-box" id="resDestino"><div class="empty-state">Digite o nome da cidade ou UF acima.</div></div>
+        </div>
+      </div>
+
+      <div class="route-panel">
+        <div class="route-display">
+          <div class="route-box-clickable" id="boxOri" onclick="copiarCaixaRota('origem', this)" title="Clique para copiar">
+            <div class="route-box-content">
+              <div class="route-box-header">
+                <span class="route-box-label ori">Origem Selecionada</span>
+                <span style="font-size:0.68rem; color:var(--text-muted);">📋 copiar</span>
+              </div>
+              <div class="route-box-val" id="oriView">Nenhuma cidade</div>
+            </div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+
+          <div class="route-actions">
+            <button class="btn-action" onclick="inverterRota()">⇄ Inverter</button>
+            <button class="btn-action" onclick="copiarRotaCompleta(this)">📋 Copiar Rota</button>
+            <button class="btn-action" onclick="abrirGoogleMaps()">🗺 Trajeto</button>
+            <button class="btn-action" style="color:var(--danger);" onclick="limparTudo()">✕ Limpar Tudo</button>
+          </div>
+
+          <div class="route-box-clickable" id="boxDes" onclick="copiarCaixaRota('destino', this)" title="Clique para copiar">
+            <div class="route-box-content">
+              <div class="route-box-header">
+                <span class="route-box-label des">Destino Selecionado</span>
+                <span style="font-size:0.68rem; color:var(--text-muted);">📋 copiar</span>
+              </div>
+              <div class="route-box-val" id="desView">Nenhuma cidade</div>
+            </div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+        </div>
+
+        <div class="fiscal-diag-row">
+          <div class="fiscal-diag pendente" id="fiscalDiag">⚪ Selecione a Origem e o Destino para avaliar a operação fiscal.</div>
+          <div class="aliquota-tag">
+            <span>Alíquota ICMS:</span>
+            <span class="aliquota-val" id="aliquotaVal">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. CFOPS COM DESCRIÇÃO EM TEMPO REAL -->
+  <div class="cfop-module-card">
+    <div class="module-header">
+      <div class="module-title">📦 Códigos Fiscais de Operação <span>(CFOPs com Descrição em Tempo Real)</span></div>
+      <div class="module-actions">
+        <button class="btn-add-slot" onclick="adicionarCfopSlot()">➕ Adicionar CFOP (+)</button>
+        <button class="btn-toggle-module" id="btnToggleCfop" onclick="alternarModulo('cfopBody', 'btnToggleCfop', 'cfop_col')">➖ Recolher Módulo</button>
+      </div>
+    </div>
+    <div id="cfopBody" style="display:flex; flex-direction:column; gap:12px;">
+      <div class="cfop-container" id="cfopSlotsContainer">
+        <div class="cfop-box" id="cfopSlot_nfe">
+          <div class="cfop-header">
+            <span class="cfop-title nfe">📦 CFOP NF-e (Mercadoria)</span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">Digite ou clique nas sugestões</span>
+          </div>
+          <div class="cfop-input-group">
+            <input type="text" id="manualCfopNfe" class="cfop-input-manual" placeholder="5102" value="5102" maxlength="5" oninput="atualizarDescricaoCFOP('nfe')">
+            <button class="btn-copy-cfop-manual" id="btnCopyNfe" onclick="copiarCFOPManual('manualCfopNfe', this)">Copiar CFOP</button>
+          </div>
+          <div class="cfop-desc-box" id="descCfopNfe">Carregando descrição...</div>
+          <div class="cfop-chips">
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '102')">Venda: <strong id="chipNfeVenda">5.102</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '405')">ST: <strong id="chipNfeST">5.405</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '152')">Transf: <strong id="chipNfeTransf">5.152</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '202')">Devol: <strong id="chipNfeDevol">5.202</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '949')">Outras: <strong id="chipNfeOutras">5.949</strong></div>
+          </div>
+        </div>
+
+        <div class="cfop-box" id="cfopSlot_cte">
+          <div class="cfop-header">
+            <span class="cfop-title cte">🚛 CFOP CT-e (Frete / Transporte)</span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">Digite ou clique nas sugestões</span>
+          </div>
+          <div class="cfop-input-group">
+            <input type="text" id="manualCfopCte" class="cfop-input-manual" placeholder="5353" value="5353" maxlength="5" oninput="atualizarDescricaoCFOP('cte')">
+            <button class="btn-copy-cfop-manual" id="btnCopyCte" onclick="copiarCFOPManual('manualCfopCte', this)">Copiar CFOP</button>
+          </div>
+          <div class="cfop-desc-box" id="descCfopCte">Carregando descrição...</div>
+          <div class="cfop-chips">
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '353')">Comércio: <strong id="chipCteCom">5.353</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '352')">Indústria: <strong id="chipCteInd">5.352</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '354')">Redespacho: <strong id="chipCteRed">5.354</strong></div>
+            <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '357')">Não Contrib: <strong id="chipCteNC">5.357</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. DE-PARA DE CÓDIGOS DE IMPOSTO -->
+  <div class="depara-card">
+    <div class="module-header">
+      <div class="module-title">🔄 De-Para de Códigos de Imposto <span>(Antigo ➔ Novo)</span></div>
+      <div class="module-actions">
+        <button class="btn-add-slot" onclick="adicionarSlotDePara()">➕ Adicionar Código (+)</button>
+        <button class="btn-toggle-module" id="btnCollapseDePara" onclick="alternarModulo('deparaBody', 'btnCollapseDePara', 'depara_col')">➖ Recolher Módulo</button>
+      </div>
+    </div>
+    <div id="deparaBody" style="display:flex; flex-direction:column; gap:14px;">
+      <div id="deparaSlotsContainer" style="display:flex; flex-direction:column; gap:14px;">
+        <div class="depara-slot" id="deparaSlot_1">
+          <div class="depara-slot-header">
+            <span class="depara-slot-title">🔎 Consulta #1</span>
+            <button class="btn-remove-slot" style="background:var(--bg-card); color:var(--text-muted); border-color:var(--border);" onclick="limparSlotDePara(1)">✕ Limpar</button>
+          </div>
+          <div class="depara-input-row">
+            <input type="text" id="inputCodAntigo_1" class="input-cidade input-depara" placeholder="Digite código antigo ou descrição (ex: E00I00PC, VENDA, DIFAL, 2551-001)..." oninput="pesquisarImpostoSlot(1)">
+            <button class="btn-key-clear" onclick="limparSlotDePara(1)">Limpar</button>
+          </div>
+          <div class="depara-matches-container" id="deparaMatchesBox_1"></div>
+          <div class="depara-result-box" id="deparaResultBox_1">
+            <div class="depara-main-row">
+              <div class="depara-code-pair">
+                <div>
+                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo</div>
+                  <span class="depara-badge-old" id="deparaValAntigo_1">--</span>
+                </div>
+                <span class="depara-arrow">➔</span>
+                <div>
+                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Novo Código (Clique p/ Copiar)</div>
+                  <div class="depara-badge-new" id="deparaValNovo_1" onclick="copiarNovoCodigoImposto(this, 1)">
+                    <span id="deparaNovoTxt_1">--</span>
+                    <span style="font-size:0.7rem; opacity:0.8;">📋</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Operação</div>
+                <span class="badge badge-destino" id="deparaOperacao_1" style="font-size:0.8rem;">--</span>
+              </div>
+            </div>
+            <div class="depara-desc-title" id="deparaDescricao_1">Digite um código de imposto antigo acima para ver o novo formato e suas alíquotas.</div>
+            <div class="depara-details-grid">
+              <div class="depara-detail-item"><span class="depara-detail-lbl">ICMS</span><span class="depara-detail-val" id="deparaIcms_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">IPI</span><span class="depara-detail-val" id="deparaIpi_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">PIS</span><span class="depara-detail-val" id="deparaPis_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">COFINS</span><span class="depara-detail-val" id="deparaCofins_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">ISS</span><span class="depara-detail-val" id="deparaIss_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_1">--</span></div>
+              <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_1" style="font-size:0.75rem;">--</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. DESMEMBRADOR DE CHAVES DE ACESSO -->
+  <div class="key-parser-card">
+    <div class="module-header">
+      <div class="module-title">🔑 Desmembrador de Chaves de Acesso <span>(NF-e / CT-e / MDF-e)</span></div>
+      <div class="module-actions">
+        <button class="btn-add-slot" onclick="adicionarKeySlot()">➕ Adicionar Chave (+)</button>
+        <button class="btn-toggle-module" id="btnToggleKey" onclick="alternarModulo('keyBody', 'btnToggleKey', 'key_col')">➖ Recolher Módulo</button>
+      </div>
+    </div>
+    <div id="keyBody" style="display:flex; flex-direction:column; gap:12px;">
+      <div id="keySlotsContainer" style="display:flex; flex-direction:column; gap:14px;">
+        <div class="key-slot" id="keySlot_1">
+          <div class="key-slot-header">
+            <span class="key-slot-title">🔑 Chave #1</span>
+            <button class="btn-remove-slot" style="background:var(--bg-input); color:var(--text-muted); border-color:var(--border);" onclick="limparChaveSlot(1)">✕ Limpar</button>
+          </div>
+          <div class="key-input-row">
+            <input type="text" id="inputChaveAcesso_1" class="input-cidade input-key" placeholder="Cole a chave de 44 dígitos aqui..." oninput="desmembrarChaveSlot(1)">
+            <button class="btn-sefaz-consult" onclick="abrirConsultaSefazSlot(1)">🔍 Consultar SEFAZ</button>
+            <button class="btn-key-clear" onclick="limparChaveSlot(1)">Limpar</button>
+          </div>
+          <div class="key-grid-results">
+            <div class="key-chip-result key-chip-full" onclick="copiarTextoValor(this, 'valDescCompleta_1')">
+              <div class="key-chip-label"><span>Descrição Completa</span><span>📋 copiar</span></div>
+              <div class="key-chip-val highlight" id="valDescCompleta_1">--</div>
+              <span class="feedback-badge">Copiado!</span>
+            </div>
+            <div class="key-chip-result" onclick="copiarTextoValor(this, 'valChaveLimpa_1')">
+              <div class="key-chip-label"><span>Chave Limpa (44 dígitos)</span><span>📋 copiar</span></div>
+              <div class="key-chip-val highlight" id="valChaveLimpa_1">--</div>
+              <span class="feedback-badge">Copiado!</span>
+            </div>
+            <div class="key-chip-result" onclick="copiarTextoValor(this, 'valCnpjEmitente_1')">
+              <div class="key-chip-label"><span>CNPJ Emitente</span><span>📋 copiar</span></div>
+              <div class="key-chip-val" id="valCnpjEmitente_1">--</div>
+              <span class="feedback-badge">Copiado!</span>
+            </div>
+            <div class="key-chip-result" onclick="copiarTextoValor(this, 'valDocSerie_1')">
+              <div class="key-chip-label"><span>Documento & Série</span><span>📋 copiar</span></div>
+              <div class="key-chip-val highlight" id="valDocSerie_1">--</div>
+              <span class="feedback-badge">Copiado!</span>
+            </div>
+            <div class="key-chip-result" onclick="copiarTextoValor(this, 'valInfoAdicional_1')">
+              <div class="key-chip-label"><span>UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
+              <div class="key-chip-val" id="valInfoAdicional_1">--</div>
+              <span class="feedback-badge">Copiado!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ufsPrefix = {
+    "11":"RO","12":"AC","13":"AM","14":"RR","15":"PA","16":"AP","17":"TO",
+    "21":"MA","22":"PI","23":"CE","24":"RN","25":"PB","26":"PE","27":"AL",
+    "28":"SE","29":"BA","31":"MG","32":"ES","33":"RJ","35":"SP","41":"PR",
+    "42":"SC","43":"RS","50":"MS","51":"MT","52":"GO","53":"DF"
+  };
+
+  const sulSudesteSemES = ["SP", "RJ", "MG", "PR", "SC", "RS"];
+  const norteNordesteCO_ES = ["AC","AP","AM","PA","RO","RR","TO","AL","BA","CE","MA","PB","PE","PI","RN","SE","DF","GO","MT","MS","ES"];
+
+  /* Base offline pré-carregada para funcionamento sem internet */
+  const baseOfflinePadrao = [
+    {c:"5003207", n:"Corumbá", u:"MS"},
+    {c:"5002704", n:"Campo Grande", u:"MS"},
+    {c:"5005400", n:"Ladário", u:"MS"},
+    {c:"5003702", n:"Dourados", u:"MS"},
+    {c:"5007901", n:"Sidrolândia", u:"MS"},
+    {c:"5008305", n:"Três Lagoas", u:"MS"},
+    {c:"4104808", n:"Cascavel", u:"PR"},
+    {c:"4106902", n:"Curitiba", u:"PR"},
+    {c:"4113700", n:"Londrina", u:"PR"},
+    {c:"4115200", n:"Maringá", u:"PR"},
+    {c:"4118501", n:"Pato Branco", u:"PR"},
+    {c:"3550308", n:"São Paulo", u:"SP"},
+    {c:"3548500", n:"Santos", u:"SP"},
+    {c:"3552205", n:"Sorocaba", u:"SP"},
+    {c:"3551702", n:"Sertãozinho", u:"SP"},
+    {c:"3509502", n:"Campinas", u:"SP"},
+    {c:"3106200", n:"Belo Horizonte", u:"MG"},
+    {c:"3130101", n:"Igarapé", u:"MG"},
+    {c:"3118601", n:"Contagem", u:"MG"},
+    {c:"3106705", n:"Betim", u:"MG"},
+    {c:"3170206", n:"Uberlândia", u:"MG"},
+    {c:"3304557", n:"Rio de Janeiro", u:"RJ"},
+    {c:"5103403", n:"Cuiabá", u:"MT"},
+    {c:"5107602", n:"Rondonópolis", u:"MT"},
+    {c:"5208707", n:"Goiânia", u:"GO"},
+    {c:"5300108", n:"Brasília", u:"DF"}
+  ];
+
+  const dicionarioCFOP = {
+    "5101": "Venda de produção do estabelecimento no mesmo Estado.",
+    "6101": "Venda de produção do estabelecimento para outro Estado.",
+    "5102": "Venda de mercadoria adquirida ou recebida de terceiros no mesmo Estado.",
+    "6102": "Venda de mercadoria adquirida ou recebida de terceiros para outro Estado.",
+    "5103": "Venda de produção efetuada fora do estabelecimento no mesmo Estado.",
+    "6103": "Venda de produção efetuada fora do estabelecimento para outro Estado.",
+    "5104": "Venda de mercadoria de terceiros efetuada fora do estabelecimento no Estado.",
+    "6104": "Venda de mercadoria de terceiros fora do estabelecimento para outro Estado.",
+    "5401": "Venda de produção com mercadoria sujeita a Substituição Tributária (contribuinte substituto).",
+    "6401": "Venda interestadual de produção com mercadoria sujeita a Substituição Tributária.",
+    "5403": "Venda de mercadoria de terceiros com ST (contribuinte substituto).",
+    "6403": "Venda interestadual de mercadoria de terceiros com ST (contribuinte substituto).",
+    "5405": "Venda de mercadoria com ST na condição de contribuinte substituído (ICMS retido anteriormente).",
+    "6404": "Venda interestadual de mercadoria com ST na condição de contribuinte substituído.",
+    "5151": "Transferência de produção do estabelecimento para filial ou matriz no Estado.",
+    "6151": "Transferência de produção do estabelecimento para filial ou matriz em outro Estado.",
+    "5152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz no Estado.",
+    "6152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz em outro Estado.",
+    "5201": "Devolução de compra para industrialização no mesmo Estado.",
+    "6201": "Devolução interestadual de compra para industrialização.",
+    "5202": "Devolução de compra para comercialização no mesmo Estado.",
+    "6202": "Devolução interestadual de compra para comercialização.",
+    "5949": "Outra saída de mercadoria ou prestação de serviço não especificada no Estado.",
+    "6949": "Outra saída de mercadoria ou prestação de serviço não especificada para outro Estado.",
+    "5352": "Prestação de serviço de transporte a estabelecimento industrial no Estado.",
+    "6352": "Prestação de serviço de transporte a estabelecimento industrial em outro Estado.",
+    "5353": "Prestação de serviço de transporte a estabelecimento comercial no Estado.",
+    "6353": "Prestação de serviço de transporte a estabelecimento comercial em outro Estado.",
+    "5354": "Prestação de serviço de transporte para redespacho no Estado.",
+    "6354": "Prestação interestadual de transporte para redespacho.",
+    "5357": "Prestação de serviço de transporte a não contribuinte ou não tomador no Estado.",
+    "6357": "Prestação interestadual de transporte a não contribuinte ou não tomador."
+  };
+
+  /* Base de 203 Códigos de Imposto Rigorosamente Estruturada */
+  const dbImpostos = [
+    ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%"],
+    ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%"],
+    ["2556-002","DI000003","DI000","DIFAL","7%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%"],
+    ["2556-003","DI000004","DI000","DIFAL","12%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 12% - IPI 0% - PIS COFINS 0%"],
+    ["E00000AT","EA000001","EA0000","Ativo","-","-","-","-","-","IC-IP-PISEX-COEX","SEM CRÉDITO ICMS 0% - IPI 0% - PIS 0% - COF 0% - IMOBILIZADO: ESCRITÓRIO/INFORMATICA/VEICULOS"],
+    ["E0004AT","EAI0PC01","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
+    ["E0007AT","EAI0PC02","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
+    ["E0012AT","EAI0PC03","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
+    ["E0017AT","EAI0PC04","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
+    ["E00I00AT","EA00PC01","EA00PC","Ativo","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E00I00EX","EO000001","EO0000","Entrada outros","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% - FIM EXP EXPOR"],
+    ["E00I00NN","E0000001","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%"],
+    ["E00I00PC","E00PC001","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["E00I00PF","E0000002","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 0% - IPI 0% - PIS 0% - COFINS 0%"],
+    ["E00I05NN","E0I00001","E0I00","Entrada","-","5%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 5% PIS 0,00% COFINS 0,00%"],
+    ["E00I15NN","E0I00002","E0I00","Entrada","-","15%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 15% PIS 0,00% COFINS 0,00%"],
+    ["E04I00AT","EAI0PC05","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E04I00PC","EI0PC001","EI0PC","Entrada","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E04I00SC","EI000001","EI000","Entrada","4%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 0% COFINS % Sem IPI/PIS/COFINS"],
+    ["E07ATred","EAI0PC06","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7%-BC Red.26,57%  IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["E07I00AT","EAI0PC07","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E07I00NN","EI000002","EI000","Entrada","7%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 0% COFINS 0%"],
+    ["E07I00PC","EI0PC002","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E07I05PC","EIIPC001","EIIPC","Entrada","7%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 5% PIS 1,65% COFINS 7,60%"],
+    ["E07I10PC","EIIPC002","EIIPC","Entrada","7%","7,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 7,5% PIS 1,65% COFINS 7,60%"],
+    ["E07I35NN","EII00001","EII00","Entrada","7%","3,25%","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 0% COFINS 0%"],
+    ["E07I35PC","EIIPC003","EIIPC","Entrada","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 1,65% COFINS 7,60%"],
+    ["E07I65PC","EIIPC004","EIIPC","Entrada","7%","6,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 6,5% PIS 1,65% COFINS 7,60%"],
+    ["E1101001","E00PC002","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
+    ["E1101023","E0000003","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BT - COFINS 0 % - BT"],
+    ["E1125001","E00PC003","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1125 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,60 % - BT"],
+    ["E12I00AT","EAI0PC08","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E12I00NN","EI000003","EI000","Entrada","12%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
+    ["E12I00PC","EI0PC003","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E12I00PF","EI000004","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12% - IPI 0% - PIS 0% - COFINS 0%"],
+    ["E13I00AT","EAI0PC09","EAI0PC","Ativo","13,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 13,3% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E14I00PC","EI0PC004","EI0PC","Entrada","14%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 14% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E15I00PC","EI0PC005","EI0PC","Entrada","15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 15% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E17I00AT","EAI0PC10","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["E17I00NN","EI000005","EI000","Entrada","17%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["E17I00PC","EI0PC006","EI0PC","Entrada","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["E17I00ST","EI000006","EI000","Entrada","17%","-","-","-","-","IC-IP-PI-CF-STAL","ICMS ST 17% IPI 0% PIS 0% COFINS 0%"],
+    ["E17I05PC","EIIPC005","EIIPC","Entrada","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60%"],
+    ["E2101001","EI0PC007","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 7 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
+    ["E2101002","E00PC004","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
+    ["E2101023","EI0PC008","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 12 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
+    ["E2101025","EI000007","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI"],
+    ["E3949001","E0000004","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","3949 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI"],
+    ["ENERGIA","EG00PC01","EG00PC","Energia","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["ESN125PC","ESI0PC01","ESI0PC","Simples nacional","1,25%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,25% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN134PC","ESI0PC02","ESI0PC","Simples nacional","1,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,34% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN136PC","ESI0PC03","ESI0PC","Simples nacional","1,36%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,36% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN144PC","ESI0PC04","ESI0PC","Simples nacional","1,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,44% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN164PC","ESI0PC05","ESI0PC","Simples nacional","1,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,64% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN182PC","ESI0PC06","ESI0PC","Simples nacional","1,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,815% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN194PC","ESI0PC07","ESI0PC","Simples nacional","1,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,94% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN210PC","ESI0PC08","ESI0PC","Simples nacional","2,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,10% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN217PC","ESI0PC09","ESI0PC","Simples nacional","2,17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,17% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["ESN220PC","ESI0PC10","ESI0PC","Simples nacional","2,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,20% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN230PC","ESI0PC11","ESI0PC","Simples nacional","2,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,30% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN232PC","ESI0PC12","ESI0PC","Simples nacional","2,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,32% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN233AT","EAI0PC11","EAI0PC","Ativo","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN233PC","ESI0PC13","ESI0PC","Simples nacional","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN234PC","ESI0PC14","ESI0PC","Simples nacional","2,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,34% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN238PC","ESI0PC15","ESI0PC","Simples nacional","2,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,38% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN243PC","ESI0PC16","ESI0PC","Simples nacional","2,43%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,43% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN247PC","ESI0PC17","ESI0PC","Simples nacional","2,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,47% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN248PC","ESI0PC18","ESI0PC","Simples nacional","2,48%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,48% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN249PC","ESI0PC19","ESI0PC","Simples nacional","2,49%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,49% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN252PC","ESI0PC20","ESI0PC","Simples nacional","2,52%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,52% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN256PC","ESI0PC21","ESI0PC","Simples nacional","2,56%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,56% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN257PC","ESI0PC22","ESI0PC","Simples nacional","2,57%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,57% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN259PC","ESI0PC23","ESI0PC","Simples nacional","2,59%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,59% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN266PC","ESI0PC24","ESI0PC","Simples nacional","2,66%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,66% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN268PC","ESI0PC25","ESI0PC","Simples nacional","2,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,68% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN272PC","ESI0PC26","ESI0PC","Simples nacional","2,72%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,72% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN273PC","ESI0PC27","ESI0PC","Simples nacional","2,73%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,73% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN280PC","ESI0PC28","ESI0PC","Simples nacional","2,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,80% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN283PC","ESI0PC29","ESI0PC","Simples nacional","2,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,83% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN284AT","EAI0PC12","EAI0PC","Ativo","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN284PC","ESI0PC30","ESI0PC","Simples nacional","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN285PC","ESI0PC31","ESI0PC","Simples nacional","2,85%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,85% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN289PC","ESI0PC32","ESI0PC","Simples nacional","2,89%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,89% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN293PC","ESI0PC33","ESI0PC","Simples nacional","2,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,93% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN294PC","ESI0PC34","ESI0PC","Simples nacional","2,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,94% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN295PC","ESI0PC35","ESI0PC","Simples nacional","2,95%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,95% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN296PC","ESI0PC36","ESI0PC","Simples nacional","2,96%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,96% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN297PC","ESI0PC37","ESI0PC","Simples nacional","2,97%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,97% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN303PC","ESI0PC38","ESI0PC","Simples nacional","3,03%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,03% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN304PC","ESI0PC39","ESI0PC","Simples nacional","3,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,04% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN305PC","ESI0PC40","ESI0PC","Simples nacional","3,05%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,05% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN307AT","EAI0PC13","EAI0PC","Ativo","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,07 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN307PC","ESI0PC41","ESI0PC","Simples nacional","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,07% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN310AT","EAI0PC14","EAI0PC","Ativo","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,10 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN310PC","ESI0PC42","ESI0PC","Simples nacional","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,10% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN312PC","ESI0PC43","ESI0PC","Simples nacional","3,12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,12% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN313AT","EAI0PC15","EAI0PC","Ativo","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN313PC","ESI0PC44","ESI0PC","Simples nacional","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN315PC","ESI0PC45","ESI0PC","Simples nacional","3,15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,15% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN316PC","ESI0PC46","ESI0PC","Simples nacional","3,16%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,16% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN320PC","ESI0PC47","ESI0PC","Simples nacional","3,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,20% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN323PC","ESI0PC48","ESI0PC","Simples nacional","3,23%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,23% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN327PC","ESI0PC49","ESI0PC","Simples nacional","3,27%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,27% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN328AT","EAI0PC16","EAI0PC","Ativo","3,28%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,28% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN332PC","ESI0PC50","ESI0PC","Simples nacional","3,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,32% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN337PC","ESI0PC51","ESI0PC","Simples nacional","3,37%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,37% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN338PC","ESI0PC52","ESI0PC","Simples nacional","3,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,38% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN341AT","EAI0PC17","EAI0PC","Ativo","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN341PC","ESI0PC53","ESI0PC","Simples nacional","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN343PC","ESI0PC54","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN344PC","ESI0PC55","ESI0PC","Simples nacional","3,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,44% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN345PC","ESI0PC56","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN347PC","ESI0PC57","ESI0PC","Simples nacional","3,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,47% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN350PC","ESI0PC58","ESI0PC","Simples nacional","3,50%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,50% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN355PC","ESI0PC59","ESI0PC","Simples nacional","3,55%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,55% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN358PC","ESI0PC60","ESI0PC","Simples nacional","3,58%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,58% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN364PC","ESI0PC61","ESI0PC","Simples nacional","3,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,64% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN365PC","ESI0PC62","ESI0PC","Simples nacional","3,65%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,65% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN367PC","ESI0PC63","ESI0PC","Simples nacional","3,67%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,67% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN368PC","ESI0PC64","ESI0PC","Simples nacional","3,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,68% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN369PC","ESI0PC65","ESI0PC","Simples nacional","3,69%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,69% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN371PC","ESI0PC66","ESI0PC","Simples nacional","3,71%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,71% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN375PC","ESI0PC67","ESI0PC","Simples nacional","3,75%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,75% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN376PC","ESI0PC68","ESI0PC","Simples nacional","3,76%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,76% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN380PC","ESI0PC69","ESI0PC","Simples nacional","3,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,80% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN381PC","ESI0PC70","ESI0PC","Simples nacional","3,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,81% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN383PC","ESI0PC71","ESI0PC","Simples nacional","3,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,83% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN384AT","EAI0PC18","EAI0PC","Ativo","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN384PC","ESI0PC72","ESI0PC","Simples nacional","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN388PC","ESI0PC73","ESI0PC","Simples nacional","3,88%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,88% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN393PC","ESI0PC74","ESI0PC","Simples nacional","3,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,93% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN394AT","EAI0PC19","EAI0PC","Ativo","3,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,94% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN399AT","EAI0PC20","EAI0PC","Ativo","3,99%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,99% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
+    ["ESN400AT","EAI0PC21","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
+    ["ESN400PC","ESI0PC75","ESI0PC","Simples nacional","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,00% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN404PC","ESI0PC76","ESI0PC","Simples nacional","4,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,04% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN890PC","ESI0PC77","ESI0PC","Simples nacional","8,90%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 8,90% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["ESN900PC","ESI0PC78","ESI0PC","Simples nacional","9%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 9,00% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["FIX012","SOI0PC01","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF - fixo","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["IC-00001","CI000001","CI000","Complemento","4%","-","-","-","-","ICMS","Complemento de ICMS"],
+    ["IC-00002","CI000002","CI000","Complemento","7%","-","-","-","-","ICMS","Complemento ICMS 7%"],
+    ["IC-00003","CI000003","CI000","Complemento","3%","-","-","-","-","ICMS","Complemento de ICMS"],
+    ["IC-00004","CI000004","CI000","Complemento","17%","-","-","-","-","ICMS","Complemento ICMS 17%"],
+    ["IC-00325","C0I00001","C0I00","Complemento","-","3,25%","-","-","-","IPI","Complemento de IPI"],
+    ["IC000012","CI000005","CI000","Complemento","12%","-","-","-","-","ICMS","Complemento de ICMS"],
+    ["IC100012","CI000006","CI000","Complemento","12%","-","-","-","-","-","Complemento de ICMS BC 100%"],
+    ["IMP 00","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 0% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%"],
+    ["IMP 01","EI00PC01","EI00PC","Importação","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 10,65%"],
+    ["IMP 12,6","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12,60% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%"],
+    ["IMP II 2","EI0IPC01","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 2% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%"],
+    ["IMP II12","EI0IPC02","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%"],
+    ["IMP II96","EI0IPC03","EI0IPC","Importação","-","6,50%","2,10%","9,65%","-","II-IC-IP-PI-CF2","II 96% ICMS 0% IPI 65% PIS 2,10% COFINS 9,65%"],
+    ["S00000VL","SPCIS001","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS"],
+    ["S00001VL","SPCIS002","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS"],
+    ["S00I0051","S0000001","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ICMS Diferido"],
+    ["S00I00IM","S00PC001","S00PC","Saída","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 9,65%"],
+    ["S00I00NN","S0000002","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%"],
+    ["S00I00PC","S00PC002","S00PC","Saída","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["S00I00VE","S00PC003","S00PC","Saída","-","-","0,65%","3%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0,65% COFINS 3,00%"],
+    ["S04I00NN","SI000001","SI000","Saída","4%","-","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 0% PIS 0% COFINS 0%"],
+    ["S04I00PC","SI0PC001","SI0PC","Saída","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S04I10NN","SII00001","SII00","Saída","4%","10%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 10% PIS 0% COFINS 0%"],
+    ["S04I65NN","SII00002","SII00","Saída","4%","6,50%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 6,5% PIS 0% COFINS 0%"],
+    ["S07I00NN","SI000002","SI000","Saída","7%","-","-","-","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 0% COFINS 0%"],
+    ["S07I00PC","SI0PC002","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S07I325","SIIPC001","SIIPC","Saída","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS"],
+    ["S07I325N","SII00003","SII00","Saída","7%","3,25%","-","-","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 0% COFINS 0% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS"],
+    ["S12I00MG","SI0PC003","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S12I00NN","SI000003","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
+    ["S12I00PC","SI0PC004","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S12I00RR","SI000004","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
+    ["S12I00TR","SI000005","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFI 0% TRANSF MS P/ MG"],
+    ["S12I05PC","SIIPC002","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S12I0PC","SI0PC005","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S12I10NN","SII00004","SII00","Saída","12%","10%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 10% PIS 0% COFINS 0%"],
+    ["S12I325","SIIPC003","SIIPC","Saída","12%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S12I375","SIIPC004","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S12I375N","SII00005","SII00","Saída","12%","3,75%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 0% COFINS 0%"],
+    ["S12I375P","SIIPC005","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S12I5PC","SIIPC006","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S12IPCPA","SI0PC006","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S17I00B1","SI000006","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["S17I00IM","SI0PC007","SI0PC","Saída","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 9,65%"],
+    ["S17I00MM","SI0PC008","SI0PC","Saída","17%","-","2,10%","10,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 10,65%"],
+    ["S17I00NN","SI000007","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["S17I00PC","SI0PC009","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S17I00R2","SI000008","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["S17I00RB","SI000009","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["S17I05PC","SIIPC007","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S17I0PC","SI0PC010","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S17I325M","SIIPC008","SIIPC","Saída","17%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS BC PIS/COFINS"],
+    ["S17I375","SIIPC009","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S17I375P","SIIPC010","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S17I5PC","SIIPC011","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["S17IBC70","SI000010","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
+    ["S18I00PC","SI0PC011","SI0PC","Saída","18%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 18% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
+    ["S7I0PC","SI0PC012","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
+    ["SERV-IMO","EA000002","EA0000","Ativo","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ATIVO FIXO"],
+    ["SINISTRO","SO00PC01","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% - Sinistro"],
+    ["TESTE","SO00PC02","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IP-IC-PI-CF S/ ICMS","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%"],
+    ["VEN ORFE","SOI0PC02","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["VEND GV2","SO00PC03","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
+    ["VENDA GV","SOI0PC03","SOI0PC","Saída outros","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%"]
+  ];
+
+  let listaCidades = [];
+  let formatoAtual = 'codigo';
+  let cidadeSelecionadaOri = null;
+  let cidadeSelecionadaDes = null;
+  let favoritos = ["3550308", "5002704", "4104808", "5003207", "3130101"];
+  try {
+    const f = localStorage.getItem('ibge_favs');
+    if (f) favoritos = JSON.parse(f);
+  } catch (e) {}
+
+  let activeIndex = { origem: -1, destino: -1 };
+  let origemAguardandoTab = false;
+
+  function normalizar(txt) {
+    if (!txt) return "";
+    return String(txt).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  }
+
+  function normalizarChaveBusca(txt) {
+    return normalizar(txt).replace(/1/g, 'i').replace(/0/g, 'o').replace(/[^a-z0-9]/g, '');
+  }
+
+  function alternarModulo(bodyId, btnId, keyStorage) {
+    const body = document.getElementById(bodyId);
+    const btn = document.getElementById(btnId);
+    if (!body) return;
+    const estaOculto = (body.style.display === 'none');
+    if (estaOculto) {
+      body.style.display = 'flex';
+      if (btn) btn.textContent = '➖ Recolher Módulo';
+      if (keyStorage) { try { localStorage.setItem(keyStorage, 'aberto'); } catch(e){} }
+    } else {
+      body.style.display = 'none';
+      if (btn) btn.textContent = '➕ Expandir Módulo';
+      if (keyStorage) { try { localStorage.setItem(keyStorage, 'recolhido'); } catch(e){} }
+    }
+  }
+
+  function recolherTodosModulos() {
+    ['ibgeBody', 'cfopBody', 'deparaBody', 'keyBody'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    const b1 = document.getElementById('btnToggleIbge'); if (b1) b1.textContent = '➕ Expandir Módulo';
+    const b2 = document.getElementById('btnToggleCfop'); if (b2) b2.textContent = '➕ Expandir Módulo';
+    const b3 = document.getElementById('btnCollapseDePara'); if (b3) b3.textContent = '➕ Expandir Módulo';
+    const b4 = document.getElementById('btnToggleKey'); if (b4) b4.textContent = '➕ Expandir Módulo';
+
+    try {
+      localStorage.setItem('ibge_col', 'recolhido');
+      localStorage.setItem('cfop_col', 'recolhido');
+      localStorage.setItem('depara_col', 'recolhido');
+      localStorage.setItem('key_col', 'recolhido');
+    } catch(e){}
+  }
+
+  function expandirTodosModulos() {
+    ['ibgeBody', 'cfopBody', 'deparaBody', 'keyBody'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'flex';
+    });
+    const b1 = document.getElementById('btnToggleIbge'); if (b1) b1.textContent = '➖ Recolher Módulo';
+    const b2 = document.getElementById('btnToggleCfop'); if (b2) b2.textContent = '➖ Recolher Módulo';
+    const b3 = document.getElementById('btnCollapseDePara'); if (b3) b3.textContent = '➖ Recolher Módulo';
+    const b4 = document.getElementById('btnToggleKey'); if (b4) b4.textContent = '➖ Recolher Módulo';
+
+    try {
+      localStorage.setItem('ibge_col', 'aberto');
+      localStorage.setItem('cfop_col', 'aberto');
+      localStorage.setItem('depara_col', 'aberto');
+      localStorage.setItem('key_col', 'aberto');
+    } catch(e){}
+  }
+
+  function carregarEstadosModulosSalvos() {
+    const modulos = [
+      { body: 'ibgeBody', btn: 'btnToggleIbge', key: 'ibge_col' },
+      { body: 'cfopBody', btn: 'btnToggleCfop', key: 'cfop_col' },
+      { body: 'deparaBody', btn: 'btnCollapseDePara', key: 'depara_col' },
+      { body: 'keyBody', btn: 'btnToggleKey', key: 'key_col' }
+    ];
+    modulos.forEach(m => {
+      try {
+        const estado = localStorage.getItem(m.key);
+        const body = document.getElementById(m.body);
+        const btn = document.getElementById(m.btn);
+        if (estado === 'recolhido') {
+          if (body) body.style.display = 'none';
+          if (btn) btn.textContent = '➕ Expandir Módulo';
+        } else {
+          if (body) body.style.display = 'flex';
+          if (btn) btn.textContent = '➖ Recolher Módulo';
+        }
+      } catch(e){}
+    });
+  }
+
+  /* DE-PARA DE IMPOSTOS: SLOTS DINÂMICOS (+ E -) */
+  let deparaSlotCount = 1;
+  function adicionarSlotDePara() {
+    deparaSlotCount++;
+    const container = document.getElementById('deparaSlotsContainer');
+    const div = document.createElement('div');
+    const id = deparaSlotCount;
+    div.innerHTML = `
+      <div class="depara-slot" id="deparaSlot_${id}">
+        <div class="depara-slot-header">
+          <span class="depara-slot-title">🔎 Consulta #${id}</span>
+          <button class="btn-remove-slot" onclick="removerSlotDePara(${id})">➖ Recolher (-)</button>
+        </div>
+        <div class="depara-input-row">
+          <input type="text" id="inputCodAntigo_${id}" class="input-cidade input-depara" placeholder="Digite código antigo ou descrição (ex: E00I00PC, VENDA, DIFAL)..." oninput="pesquisarImpostoSlot(${id})">
+          <button class="btn-key-clear" onclick="limparSlotDePara(${id})">Limpar</button>
+        </div>
+        <div class="depara-matches-container" id="deparaMatchesBox_${id}"></div>
+        <div class="depara-result-box" id="deparaResultBox_${id}">
+          <div class="depara-main-row">
+            <div class="depara-code-pair">
+              <div>
+                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo</div>
+                <span class="depara-badge-old" id="deparaValAntigo_${id}">--</span>
+              </div>
+              <span class="depara-arrow">➔</span>
+              <div>
+                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Código Novo</div>
+                <div class="depara-badge-new" id="deparaValNovo_${id}" onclick="copiarNovoCodigoImposto(this, ${id})">
+                  <span id="deparaNovoTxt_${id}">--</span>
+                  <span style="font-size:0.7rem; opacity:0.8;">📋</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Operação</div>
+              <span class="badge badge-destino" id="deparaOperacao_${id}" style="font-size:0.8rem;">--</span>
+            </div>
+          </div>
+          <div class="depara-desc-title" id="deparaDescricao_${id}">Digite um código de imposto antigo acima para ver o novo formato e suas alíquotas.</div>
+          <div class="depara-details-grid">
+            <div class="depara-detail-item"><span class="depara-detail-lbl">ICMS</span><span class="depara-detail-val" id="deparaIcms_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">IPI</span><span class="depara-detail-val" id="deparaIpi_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">PIS</span><span class="depara-detail-val" id="deparaPis_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">COFINS</span><span class="depara-detail-val" id="deparaCofins_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">ISS</span><span class="depara-detail-val" id="deparaIss_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_${id}">--</span></div>
+            <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_${id}" style="font-size:0.75rem;">--</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div.firstElementChild);
+    document.getElementById('deparaBody').style.display = 'flex';
+    document.getElementById('btnCollapseDePara').textContent = '➖ Recolher Módulo';
+  }
+
+  function removerSlotDePara(id) {
+    const el = document.getElementById(`deparaSlot_${id}`);
+    if (el) el.remove();
+  }
+
+  function pesquisarImpostoSlot(id) {
+    const input = document.getElementById(`inputCodAntigo_${id}`);
+    if (!input) return;
+    const raw = input.value.trim();
+    const termo = normalizar(raw);
+    const termoFuzzy = normalizarChaveBusca(raw);
+    const boxMatches = document.getElementById(`deparaMatchesBox_${id}`);
+
+    if (!termo) {
+      limparSlotVisual(id);
+      if (boxMatches) boxMatches.style.display = 'none';
+      return;
+    }
+
+    const matches = dbImpostos.filter(item => {
+      const cAntigo = normalizar(item[0]);
+      const cNovo = normalizar(item[1]);
+      const cDesc = normalizar(item[10] || "");
+      const cAntigoFuzzy = normalizarChaveBusca(item[0]);
+      return cAntigo.includes(termo) || cNovo.includes(termo) || cDesc.includes(termo) ||
+             (termoFuzzy.length >= 3 && cAntigoFuzzy.includes(termoFuzzy));
+    });
+
+    if (matches.length === 0) {
+      if (boxMatches) boxMatches.style.display = 'none';
+      document.getElementById(`deparaValAntigo_${id}`).textContent = raw.toUpperCase();
+      document.getElementById(`deparaNovoTxt_${id}`).textContent = "Não encontrado";
+      document.getElementById(`deparaOperacao_${id}`).textContent = "--";
+      document.getElementById(`deparaDescricao_${id}`).textContent = "Nenhum código correspondente encontrado na tabela.";
+      document.getElementById(`deparaIcms_${id}`).textContent = "--";
+      document.getElementById(`deparaIpi_${id}`).textContent = "--";
+      document.getElementById(`deparaPis_${id}`).textContent = "--";
+      document.getElementById(`deparaCofins_${id}`).textContent = "--";
+      document.getElementById(`deparaIss_${id}`).textContent = "--";
+      document.getElementById(`deparaMacro_${id}`).textContent = "--";
+      document.getElementById(`deparaComb_${id}`).textContent = "--";
+      return;
+    }
+
+    const exact = matches.find(item => normalizar(item[0]) === termo || normalizarChaveBusca(item[0]) === termoFuzzy);
+    const selected = exact || matches[0];
+    exibirImpostoSlot(selected, id);
+
+    if (matches.length > 1 && boxMatches) {
+      let html = '';
+      matches.slice(0, 8).forEach(m => {
+        html += `
+          <div class="depara-match-row" onclick="selecionarImpostoPelaLinhaSlot('${m[0]}', ${id})">
+            <span style="font-family:Consolas, monospace; font-weight:bold; color:var(--destino);">${m[0]}</span>
+            <span style="color:var(--text-muted); font-size:0.75rem;">➔</span>
+            <span style="font-family:Consolas, monospace; font-weight:bold; color:var(--brand-green);">${m[1]}</span>
+            <span style="font-size:0.72rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:400px; margin-left:6px;">${m[10] || ''}</span>
+          </div>
+        `;
+      });
+      boxMatches.innerHTML = html;
+      boxMatches.style.display = 'flex';
+    } else if (boxMatches) {
+      boxMatches.style.display = 'none';
+    }
+  }
+
+  function exibirImpostoSlot(item, id) {
+    document.getElementById(`deparaValAntigo_${id}`).textContent = item[0] || "--";
+    document.getElementById(`deparaNovoTxt_${id}`).textContent = item[1] || "--";
+    document.getElementById(`deparaMacro_${id}`).textContent = item[2] || "--";
+    document.getElementById(`deparaOperacao_${id}`).textContent = item[3] || "--";
+    document.getElementById(`deparaIcms_${id}`).textContent = item[4] || "--";
+    document.getElementById(`deparaIpi_${id}`).textContent = item[5] || "--";
+    document.getElementById(`deparaPis_${id}`).textContent = item[6] || "--";
+    document.getElementById(`deparaCofins_${id}`).textContent = item[7] || "--";
+    document.getElementById(`deparaIss_${id}`).textContent = item[8] || "--";
+    document.getElementById(`deparaComb_${id}`).textContent = item[9] || "-";
+    document.getElementById(`deparaDescricao_${id}`).textContent = item[10] || "Descrição não cadastrada";
+  }
+
+  function selecionarImpostoPelaLinhaSlot(codAntigo, id) {
+    document.getElementById(`inputCodAntigo_${id}`).value = codAntigo;
+    const boxMatches = document.getElementById(`deparaMatchesBox_${id}`);
+    if (boxMatches) boxMatches.style.display = 'none';
+    const item = dbImpostos.find(x => x[0] === codAntigo);
+    if (item) exibirImpostoSlot(item, id);
+  }
+
+  function copiarNovoCodigoImposto(el, id) {
+    const texto = document.getElementById(`deparaNovoTxt_${id}`).textContent.trim();
+    if (!texto || texto === "--" || texto.includes("Não encontrado")) return;
+    navigator.clipboard.writeText(texto).then(() => {
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 900);
+    });
+  }
+
+  function limparSlotDePara(id) {
+    const input = document.getElementById(`inputCodAntigo_${id}`);
+    if (input) { input.value = ""; input.focus(); }
+    const boxMatches = document.getElementById(`deparaMatchesBox_${id}`);
+    if (boxMatches) boxMatches.style.display = 'none';
+    limparSlotVisual(id);
+  }
+
+  function limparSlotVisual(id) {
+    document.getElementById(`deparaValAntigo_${id}`).textContent = "--";
+    document.getElementById(`deparaNovoTxt_${id}`).textContent = "--";
+    document.getElementById(`deparaOperacao_${id}`).textContent = "--";
+    document.getElementById(`deparaDescricao_${id}`).textContent = "Digite um código de imposto antigo acima para ver o novo formato e suas alíquotas.";
+    document.getElementById(`deparaIcms_${id}`).textContent = "--";
+    document.getElementById(`deparaIpi_${id}`).textContent = "--";
+    document.getElementById(`deparaPis_${id}`).textContent = "--";
+    document.getElementById(`deparaCofins_${id}`).textContent = "--";
+    document.getElementById(`deparaIss_${id}`).textContent = "--";
+    document.getElementById(`deparaMacro_${id}`).textContent = "--";
+    document.getElementById(`deparaComb_${id}`).textContent = "--";
+  }
+
+  let cfopSlotCount = 2;
+  function adicionarCfopSlot() {
+    cfopSlotCount++;
+    const container = document.getElementById('cfopSlotsContainer');
+    const div = document.createElement('div');
+    const id = cfopSlotCount;
+    div.innerHTML = `
+      <div class="cfop-box" id="cfopSlot_${id}">
+        <div class="cfop-header">
+          <span class="cfop-title custom">🔍 Consulta CFOP #${id}</span>
+          <button class="btn-remove-slot" onclick="removerCfopSlot(${id})">➖ Recolher (-)</button>
+        </div>
+        <div class="cfop-input-group">
+          <input type="text" id="manualCfop_${id}" class="cfop-input-manual" placeholder="5102" value="5102" maxlength="5" oninput="atualizarDescricaoCFOPGenerico(${id})">
+          <button class="btn-copy-cfop-manual" onclick="copiarCFOPManual('manualCfop_${id}', this)">Copiar CFOP</button>
+        </div>
+        <div class="cfop-desc-box" id="descCfop_${id}">Carregando descrição...</div>
+      </div>
+    `;
+    container.appendChild(div.firstElementChild);
+    document.getElementById('cfopBody').style.display = 'flex';
+    document.getElementById('btnToggleCfop').textContent = '➖ Recolher Módulo';
+    atualizarDescricaoCFOPGenerico(id);
+  }
+
+  function removerCfopSlot(id) {
+    const el = document.getElementById(`cfopSlot_${id}`);
+    if (el) el.remove();
+  }
+
+  function atualizarDescricaoCFOPGenerico(id) {
+    const input = document.getElementById(`manualCfop_${id}`);
+    const descBox = document.getElementById(`descCfop_${id}`);
+    if (!input || !descBox) return;
+    const rawVal = input.value.trim().replace(/\D/g, '');
+    if (rawVal.length < 4) {
+      descBox.textContent = "Digite os 4 dígitos do CFOP para exibir a descrição oficial.";
+      return;
+    }
+    descBox.innerHTML = `<strong>CFOP ${rawVal}:</strong>&nbsp;` + buscarDescricaoCFOP(rawVal);
+  }
+
+  let keySlotCount = 1;
+  function adicionarKeySlot() {
+    keySlotCount++;
+    const container = document.getElementById('keySlotsContainer');
+    const div = document.createElement('div');
+    const id = keySlotCount;
+    div.innerHTML = `
+      <div class="key-slot" id="keySlot_${id}">
+        <div class="key-slot-header">
+          <span class="key-slot-title">🔑 Chave #${id}</span>
+          <button class="btn-remove-slot" onclick="removerKeySlot(${id})">➖ Recolher (-)</button>
+        </div>
+        <div class="key-input-row">
+          <input type="text" id="inputChaveAcesso_${id}" class="input-cidade input-key" placeholder="Cole a chave de 44 dígitos aqui..." oninput="desmembrarChaveSlot(${id})">
+          <button class="btn-sefaz-consult" onclick="abrirConsultaSefazSlot(${id})">🔍 Consultar SEFAZ</button>
+          <button class="btn-key-clear" onclick="limparChaveSlot(${id})">Limpar</button>
+        </div>
+        <div class="key-grid-results">
+          <div class="key-chip-result key-chip-full" onclick="copiarTextoValor(this, 'valDescCompleta_${id}')">
+            <div class="key-chip-label"><span>Descrição Completa</span><span>📋 copiar</span></div>
+            <div class="key-chip-val highlight" id="valDescCompleta_${id}">--</div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+          <div class="key-chip-result" onclick="copiarTextoValor(this, 'valChaveLimpa_${id}')">
+            <div class="key-chip-label"><span>Chave Limpa (44 dígitos)</span><span>📋 copiar</span></div>
+            <div class="key-chip-val highlight" id="valChaveLimpa_${id}">--</div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+          <div class="key-chip-result" onclick="copiarTextoValor(this, 'valCnpjEmitente_${id}')">
+            <div class="key-chip-label"><span>CNPJ Emitente</span><span>📋 copiar</span></div>
+            <div class="key-chip-val" id="valCnpjEmitente_${id}">--</div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+          <div class="key-chip-result" onclick="copiarTextoValor(this, 'valDocSerie_${id}')">
+            <div class="key-chip-label"><span>Documento & Série</span><span>📋 copiar</span></div>
+            <div class="key-chip-val highlight" id="valDocSerie_${id}">--</div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+          <div class="key-chip-result" onclick="copiarTextoValor(this, 'valInfoAdicional_${id}')">
+            <div class="key-chip-label"><span>UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
+            <div class="key-chip-val" id="valInfoAdicional_${id}">--</div>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div.firstElementChild);
+    document.getElementById('keyBody').style.display = 'flex';
+    document.getElementById('btnToggleKey').textContent = '➖ Recolher Módulo';
+  }
+
+  function removerKeySlot(id) {
+    const el = document.getElementById(`keySlot_${id}`);
+    if (el) el.remove();
+  }
+
+  function desmembrarChaveSlot(id) {
+    const input = document.getElementById(`inputChaveAcesso_${id}`);
+    let chave = input.value.trim().replace(/\D/g, '');
+
+    const elDescComp = document.getElementById(`valDescCompleta_${id}`);
+    const elLimpa = document.getElementById(`valChaveLimpa_${id}`);
+    const elCnpj = document.getElementById(`valCnpjEmitente_${id}`);
+    const elDocSerie = document.getElementById(`valDocSerie_${id}`);
+    const elInfo = document.getElementById(`valInfoAdicional_${id}`);
+
+    if (!chave) {
+      elDescComp.textContent = "--"; elLimpa.textContent = "--"; elCnpj.textContent = "--"; elDocSerie.textContent = "--"; elInfo.textContent = "--";
+      return;
+    }
+
+    elLimpa.textContent = chave;
+
+    if (chave.length >= 44) {
+      chave = chave.substring(0, 44);
+      elLimpa.textContent = chave;
+      const cUF = chave.substring(0, 2);
+      const aamm = chave.substring(2, 6);
+      const cnpjRaw = chave.substring(6, 20);
+      const mod = chave.substring(20, 22);
+      const serie = parseInt(chave.substring(22, 25), 10);
+      const nDoc = chave.substring(25, 34);
+
+      const cnpjFormatado = cnpjRaw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+      elCnpj.textContent = cnpjFormatado;
+
+      let nomeMod = (mod === "57") ? "CTE" : ((mod === "65") ? "NFCE" : ((mod === "58") ? "MDFE" : "NFE"));
+      elDocSerie.textContent = `${nomeMod} ${nDoc} SERIE ${serie}`;
+      elDescComp.textContent = `${nomeMod} ${nDoc} SERIE ${serie} CHAVE ${chave}`;
+
+      const siglaUf = ufsPrefix[cUF] || cUF;
+      const ano = "20" + aamm.substring(0, 2);
+      const mes = aamm.substring(2, 4);
+      elInfo.textContent = `${siglaUf} • ${mes}/${ano} • Mod ${mod}`;
+    } else {
+      elDescComp.textContent = `Aguardando 44 dígitos (${chave.length}/44)`;
+      elCnpj.textContent = `Aguardando 44 dígitos (${chave.length}/44)`;
+      elDocSerie.textContent = "--";
+      elInfo.textContent = "--";
+    }
+  }
+
+  function limparChaveSlot(id) {
+    const input = document.getElementById(`inputChaveAcesso_${id}`);
+    if (input) { input.value = ""; desmembrarChaveSlot(id); input.focus(); }
+  }
+
+  function abrirConsultaSefazSlot(id) {
+    const input = document.getElementById(`inputChaveAcesso_${id}`);
+    let chave = input.value.trim().replace(/\D/g, '');
+    if (!chave) { alert("Cole a chave antes de consultar."); input.focus(); return; }
+    if (chave.length >= 44) chave = chave.substring(0, 44);
+
+    navigator.clipboard.writeText(chave).then(() => {
+      const mod = chave.length >= 22 ? chave.substring(20, 22) : "55";
+      const urlSefaz = (mod === "57")
+        ? "https://www.cte.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=cktLvUUKqh0="
+        : "https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=";
+      window.open(urlSefaz, '_blank');
+    });
+  }
+
+  function buscarDescricaoCFOP(codigo) {
+    codigo = codigo.replace(/\D/g, '');
+    if (dicionarioCFOP[codigo]) return dicionarioCFOP[codigo];
+    const suf = codigo.substring(1);
+    const tipoOp = (codigo.startsWith('1') || codigo.startsWith('5')) ? "no mesmo Estado" : "para outro Estado";
+    if (suf === '102') return `Venda de mercadoria adquirida de terceiros ${tipoOp}.`;
+    if (suf === '405') return `Venda de mercadoria com Substituição Tributária ${tipoOp}.`;
+    if (suf === '152') return `Transferência de mercadoria de terceiros ${tipoOp}.`;
+    if (suf === '202') return `Devolução de compra para comercialização ${tipoOp}.`;
+    if (suf === '949') return `Outra saída de mercadoria não especificada ${tipoOp}.`;
+    if (suf === '353') return `Prestação de serviço de transporte a estabelecimento comercial ${tipoOp}.`;
+    if (suf === '352') return `Prestação de serviço de transporte a estabelecimento industrial ${tipoOp}.`;
+    return "Código CFOP válido. Verifique os detalhes na legislação do ICMS.";
+  }
+
+  function atualizarDescricaoCFOP(tipo) {
+    const input = document.getElementById(tipo === 'nfe' ? 'manualCfopNfe' : 'manualCfopCte');
+    const descBox = document.getElementById(tipo === 'nfe' ? 'descCfopNfe' : 'descCfopCte');
+    if (!input || !descBox) return;
+    const rawVal = input.value.trim().replace(/\D/g, '');
+    if (rawVal.length < 4) {
+      descBox.textContent = "Digite os 4 dígitos do CFOP para exibir a descrição oficial.";
+      return;
+    }
+    descBox.innerHTML = `<strong>CFOP ${rawVal}:</strong>&nbsp;` + buscarDescricaoCFOP(rawVal);
+  }
+
+  function copiarCFOPManual(inputId, btn) {
+    const input = document.getElementById(inputId);
+    let valor = input.value.trim().replace(/\D/g, '');
+    if (!valor) return;
+    navigator.clipboard.writeText(valor).then(() => {
+      btn.innerText = "✓ Copiado!";
+      setTimeout(() => { btn.innerText = "Copiar CFOP"; }, 900);
+    });
+  }
+
+  function aplicarPresetCFOP(tipo, sulfixo) {
+    const prefixo = obterPrefixoOperacao();
+    let codigo = prefixo + sulfixo;
+    if (sulfixo === '405' && prefixo === '6') codigo = '6403';
+    const inputId = tipo === 'nfe' ? 'manualCfopNfe' : 'manualCfopCte';
+    const btnId = tipo === 'nfe' ? 'btnCopyNfe' : 'btnCopyCte';
+    const input = document.getElementById(inputId);
+    input.value = codigo;
+    atualizarDescricaoCFOP(tipo);
+    copiarCFOPManual(inputId, document.getElementById(btnId));
+  }
+
+  function copiarTextoValor(elemento, idValor) {
+    const el = document.getElementById(idValor);
+    if (!el || el.textContent === "--" || el.textContent.includes("Aguardando")) return;
+    let texto = el.textContent.trim();
+    if (idValor.includes('valCnpjEmitente')) texto = texto.replace(/\D/g, '');
+    navigator.clipboard.writeText(texto).then(() => {
+      elemento.classList.add('copied');
+      setTimeout(() => elemento.classList.remove('copied'), 900);
+    });
+  }
+
+  function checarTeclas(event, tipo) {
+    if (event.key === 'Escape') { limparCard(tipo); return; }
+    if (event.key === 'Tab' && !event.shiftKey) {
+      if (tipo === 'origem' && (origemAguardandoTab || cidadeSelecionadaOri)) {
+        event.preventDefault();
+        const desInput = document.getElementById('cidadeDestino');
+        desInput.focus();
+        desInput.select();
+        origemAguardandoTab = false;
+        return;
+      }
+    }
+    const container = document.getElementById(tipo === 'origem' ? 'resOrigem' : 'resDestino');
+    const cards = container.querySelectorAll('.item-card');
+    if (cards.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (activeIndex[tipo] < cards.length - 1) {
+        activeIndex[tipo]++;
+        atualizarDestaqueTeclado(cards, activeIndex[tipo]);
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (activeIndex[tipo] > 0) {
+        activeIndex[tipo]--;
+        atualizarDestaqueTeclado(cards, activeIndex[tipo]);
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (activeIndex[tipo] >= 0 && activeIndex[tipo] < cards.length) {
+        cards[activeIndex[tipo]].click();
+      } else if (cards.length > 0) {
+        cards[0].click();
+      }
+      if (tipo === 'origem') {
+        origemAguardandoTab = true;
+        document.getElementById('cidadeOrigem').focus();
+      } else {
+        document.getElementById('cidadeDestino').focus();
+      }
+    }
+  }
+
+  function atualizarDestaqueTeclado(cards, idx) {
+    cards.forEach((card, i) => {
+      if (i === idx) {
+        card.classList.add('keyboard-active');
+        card.scrollIntoView({ block: 'nearest' });
+      } else {
+        card.classList.remove('keyboard-active');
+      }
+    });
+  }
+
+  function limparCard(tipo) {
+    if (tipo === 'origem') {
+      document.getElementById('cidadeOrigem').value = '';
+      document.getElementById('ufOrigem').value = '';
+      cidadeSelecionadaOri = null;
+      origemAguardandoTab = false;
+      document.getElementById('oriView').textContent = 'Nenhuma cidade';
+      filtrar('origem');
+      document.getElementById('cidadeOrigem').focus();
+    } else {
+      document.getElementById('cidadeDestino').value = '';
+      document.getElementById('ufDestino').value = '';
+      cidadeSelecionadaDes = null;
+      document.getElementById('desView').textContent = 'Nenhuma cidade';
+      filtrar('destino');
+      document.getElementById('cidadeDestino').focus();
+    }
+    atualizarDiagnosticoFiscal();
+  }
+
+  function limparTudo() {
+    document.getElementById('cidadeOrigem').value = '';
+    document.getElementById('ufOrigem').value = '';
+    document.getElementById('cidadeDestino').value = '';
+    document.getElementById('ufDestino').value = '';
+    cidadeSelecionadaOri = null;
+    cidadeSelecionadaDes = null;
+    origemAguardandoTab = false;
+    document.getElementById('oriView').textContent = 'Nenhuma cidade';
+    document.getElementById('desView').textContent = 'Nenhuma cidade';
+    filtrar('origem');
+    filtrar('destino');
+    atualizarDiagnosticoFiscal();
+    document.getElementById('cidadeOrigem').focus();
+  }
+
+  function atualizarDiagnosticoFiscal() {
+    const diag = document.getElementById('fiscalDiag');
+    const aliqVal = document.getElementById('aliquotaVal');
+    const inputNfe = document.getElementById('manualCfopNfe');
+    const inputCte = document.getElementById('manualCfopCte');
+
+    if (!cidadeSelecionadaOri || !cidadeSelecionadaDes) {
+      diag.className = 'fiscal-diag pendente';
+      diag.innerHTML = '⚪ Selecione a Origem e o Destino para avaliar a operação fiscal.';
+      aliqVal.textContent = '--';
+      return;
+    }
+
+    const uOri = cidadeSelecionadaOri.u;
+    const uDes = cidadeSelecionadaDes.u;
+    const isInterna = (uOri === uDes);
+    const prefixo = isInterna ? "5" : "6";
+
+    if (inputNfe && inputNfe.value.length === 4) inputNfe.value = prefixo + inputNfe.value.substring(1);
+    if (inputCte && inputCte.value.length === 4) inputCte.value = prefixo + inputCte.value.substring(1);
+
+    atualizarDescricaoCFOP('nfe');
+    atualizarDescricaoCFOP('cte');
+
+    if (isInterna) {
+      diag.className = 'fiscal-diag interna';
+      diag.innerHTML = `🟢 <strong>Operação Interna (${uOri} ➔ ${uDes})</strong> — CFOP Inicia com 1 ou 5 | Sem DIFAL`;
+      aliqVal.textContent = `Interna ${uOri}`;
+      const c1 = document.getElementById('chipNfeVenda'); if (c1) c1.textContent = '5.102';
+      const c2 = document.getElementById('chipNfeST'); if (c2) c2.textContent = '5.405';
+      const c3 = document.getElementById('chipNfeTransf'); if (c3) c3.textContent = '5.152';
+      const c4 = document.getElementById('chipNfeDevol'); if (c4) c4.textContent = '5.202';
+      const c5 = document.getElementById('chipNfeOutras'); if (c5) c5.textContent = '5.949';
+      const c6 = document.getElementById('chipCteCom'); if (c6) c6.textContent = '5.353';
+      const c7 = document.getElementById('chipCteInd'); if (c7) c7.textContent = '5.352';
+      const c8 = document.getElementById('chipCteRed'); if (c8) c8.textContent = '5.354';
+      const c9 = document.getElementById('chipCteNC'); if (c9) c9.textContent = '5.357';
+    } else {
+      diag.className = 'fiscal-diag interestadual';
+      diag.innerHTML = `🟠 <strong>Operação Interestadual (${uOri} ➔ ${uDes})</strong> — CFOP Inicia com 2 ou 6 | Sujeito a DIFAL`;
+      if (sulSudesteSemES.includes(uOri) && norteNordesteCO_ES.includes(uDes)) {
+        aliqVal.innerHTML = `<span style="color:#00e676">7%</span> (Sul/Sudeste ➔ N/NE/CO/ES)`;
+      } else {
+        aliqVal.innerHTML = `<span style="color:#fbbf24">12%</span> (Padrão Interestadual)`;
+      }
+      const c1 = document.getElementById('chipNfeVenda'); if (c1) c1.textContent = '6.102';
+      const c2 = document.getElementById('chipNfeST'); if (c2) c2.textContent = '6.403';
+      const c3 = document.getElementById('chipNfeTransf'); if (c3) c3.textContent = '6.152';
+      const c4 = document.getElementById('chipNfeDevol'); if (c4) c4.textContent = '6.202';
+      const c5 = document.getElementById('chipNfeOutras'); if (c5) c5.textContent = '6.949';
+      const c6 = document.getElementById('chipCteCom'); if (c6) c6.textContent = '6.353';
+      const c7 = document.getElementById('chipCteInd'); if (c7) c7.textContent = '6.352';
+      const c8 = document.getElementById('chipCteRed'); if (c8) c8.textContent = '6.354';
+      const c9 = document.getElementById('chipCteNC'); if (c9) c9.textContent = '6.357';
+    }
+  }
+
+  function inverterRota() {
+    const cOri = document.getElementById('cidadeOrigem').value;
+    const uOri = document.getElementById('ufOrigem').value;
+    const cDes = document.getElementById('cidadeDestino').value;
+    const uDes = document.getElementById('ufDestino').value;
+
+    document.getElementById('cidadeOrigem').value = cDes;
+    document.getElementById('ufOrigem').value = uDes;
+    document.getElementById('cidadeDestino').value = cOri;
+    document.getElementById('ufDestino').value = uOri;
+
+    const temp = cidadeSelecionadaOri;
+    cidadeSelecionadaOri = cidadeSelecionadaDes;
+    cidadeSelecionadaDes = temp;
+
+    document.getElementById('oriView').textContent = cidadeSelecionadaOri ? `${cidadeSelecionadaOri.n}/${cidadeSelecionadaOri.u} (${cidadeSelecionadaOri.c})` : 'Nenhuma cidade';
+    document.getElementById('desView').textContent = cidadeSelecionadaDes ? `${cidadeSelecionadaDes.n}/${cidadeSelecionadaDes.u} (${cidadeSelecionadaDes.c})` : 'Nenhuma cidade';
+
+    filtrar('origem');
+    filtrar('destino');
+    atualizarDiagnosticoFiscal();
+  }
+
+  function toggleFavorito(cod) {
+    if (favoritos.includes(cod)) { favoritos = favoritos.filter(x => x !== cod); }
+    else { favoritos.push(cod); }
+    try { localStorage.setItem('ibge_favs', JSON.stringify(favoritos)); } catch(e){}
+    renderFavoritos();
+    filtrar('origem');
+    filtrar('destino');
+  }
+
+  function renderFavoritos() {
+    const container = document.getElementById('favChipsContainer');
+    if (!listaCidades.length) return;
+    let html = '';
+    favoritos.forEach(cod => {
+      const c = listaCidades.find(x => x.c === cod);
+      if (c) {
+        html += `
+          <div class="fav-chip">
+            <span>${c.n}/${c.u}</span>
+            <span class="fav-btn-send ori" onclick="selecionarFavoritoDireto('${c.c}', 'origem')">Origem</span>
+            <span class="fav-btn-send des" onclick="selecionarFavoritoDireto('${c.c}', 'destino')">Destino</span>
+            <span class="fav-chip-del" onclick="toggleFavorito('${c.c}')">×</span>
+          </div>
+        `;
+      }
+    });
+    if (favoritos.length === 0) html = '<span style="font-size:0.75rem; color:var(--text-muted);">Nenhum favorito salvo. Clique em ★ para fixar.</span>';
+    container.innerHTML = html;
+  }
+
+  function selecionarFavoritoDireto(cod, tipo) {
+    const cidade = listaCidades.find(x => x.c === cod);
+    if (!cidade) return;
+    if (tipo === 'origem') {
+      document.getElementById('cidadeOrigem').value = cidade.n;
+      document.getElementById('ufOrigem').value = cidade.u;
+      filtrar('origem');
+    } else {
+      document.getElementById('cidadeDestino').value = cidade.n;
+      document.getElementById('ufDestino').value = cidade.u;
+      filtrar('destino');
+    }
+    selecionarECopiar(cod, tipo, null);
+  }
+
+  function aplicarTema(tema) {
+    document.documentElement.setAttribute('data-theme', tema);
+    try { localStorage.setItem('ibge_tema', tema); } catch(e){}
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    if (tema === 'light') { if (icon) icon.textContent = '🌙'; if (label) label.textContent = 'Modo Escuro'; }
+    else { if (icon) icon.textContent = '☀️'; if (label) label.textContent = 'Modo Claro'; }
+  }
+
+  function alternarTema() {
+    const atual = document.documentElement.getAttribute('data-theme') || 'dark';
+    aplicarTema(atual === 'dark' ? 'light' : 'dark');
+  }
+
+  async function carregarBaseIBGE(forcar = false) {
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const offlineBanner = document.getElementById('offlineBanner');
+
+    // 1. Tenta carregar do Cache LocalStorage
+    if (!forcar) {
+      try {
+        const cache = localStorage.getItem('ibge_base_v3');
+        if (cache) {
+          listaCidades = JSON.parse(cache);
+          if (listaCidades.length > 0) {
+            statusDot.className = 'status-dot ready';
+            statusText.textContent = `✅ ${listaCidades.length.toLocaleString('pt-BR')} municípios ativos`;
+            if (offlineBanner) offlineBanner.style.display = 'none';
+            renderFavoritos();
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 2. Se não há cache, ativa imediatamente a base offline interna de segurança
+    if (listaCidades.length === 0) {
+      listaCidades = baseOfflinePadrao.map(item => ({
+        c: item.c,
+        n: item.n,
+        u: item.u,
+        b: normalizar(item.n + " " + item.c)
+      }));
+      statusDot.className = 'status-dot ready';
+      statusText.textContent = `⚡ Base offline ativa (${listaCidades.length} cidades)`;
+      renderFavoritos();
+    }
+
+    // 3. Tenta baixar a base completa de 5.570 municípios do IBGE em segundo plano
+    try {
+      const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios");
+      if (!res.ok) throw new Error("Erro HTTP");
+      const dados = await res.json();
+      listaCidades = dados.map(item => {
+        const codStr = String(item.id);
+        const uf = ufsPrefix[codStr.substring(0, 2)] || "--";
+        return { c: codStr, n: item.nome, u: uf, b: normalizar(item.nome + " " + codStr) };
+      });
+      try { localStorage.setItem('ibge_base_v3', JSON.stringify(listaCidades)); } catch(e){}
+      statusDot.className = 'status-dot ready';
+      statusText.textContent = `✅ ${listaCidades.length.toLocaleString('pt-BR')} municípios ativos`;
+      if (offlineBanner) offlineBanner.style.display = 'none';
+      renderFavoritos();
+    } catch (err) {
+      // Se não houver internet, mantém a base offline ativa sem travar o app
+      if (offlineBanner) offlineBanner.style.display = 'flex';
+      statusDot.className = 'status-dot ready';
+      statusText.textContent = `⚡ Modo Offline (${listaCidades.length} cidades)`;
+    }
+  }
+
+  function setFormato(fmt, el) {
+    formatoAtual = fmt;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function formatarTexto(cidade) {
+    switch (formatoAtual) {
+      case 'cidade_uf': return `${cidade.n} - ${cidade.u}`;
+      case 'padrao_fiscal': return `${cidade.c} - ${cidade.n}/${cidade.u}`;
+      case 'xml': return `<cMun>${cidade.c}</cMun>`;
+      default: return cidade.c;
+    }
+  }
+
+  function filtrar(tipo) {
+    const cInput = document.getElementById(tipo === 'origem' ? 'cidadeOrigem' : 'cidadeDestino');
+    const uInput = document.getElementById(tipo === 'origem' ? 'ufOrigem' : 'ufDestino');
+    const container = document.getElementById(tipo === 'origem' ? 'resOrigem' : 'resDestino');
+    activeIndex[tipo] = -1;
+
+    const termoC = normalizar(cInput.value);
+    const termoU = uInput.value.trim().toUpperCase();
+
+    if (!termoC && !termoU) {
+      container.innerHTML = '<div class="empty-state">Digite o nome da cidade ou UF acima.</div>';
+      return;
+    }
+
+    const palavras = termoC.split(/\s+/).filter(p => p.length > 0);
+    const filtrados = listaCidades.filter(item => {
+      if (termoU && item.u !== termoU) return false;
+      return palavras.every(p => item.b.includes(p));
+    });
+
+    if (filtrados.length === 0) {
+      container.innerHTML = '<div class="empty-state">Nenhum município encontrado.</div>';
+      return;
+    }
+
+    let html = '';
+    filtrados.slice(0, 40).forEach((item, idx) => {
+      const isFav = favoritos.includes(item.c);
+      html += `
+        <div class="item-card" data-index="${idx}" id="card_${tipo}_${item.c}" onclick="selecionarECopiar('${item.c}', '${tipo}', this)">
+          <div class="format-line">
+            <span class="lbl-ibge">IBGE:</span>
+            <span class="val-ibge">${item.c}</span>
+            <span class="sep">&gt;</span>
+            <span class="val-cidade">${item.n}</span>
+            <span class="sep">&gt;</span>
+            <span class="val-uf">${item.u}</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn-fav-star ${isFav ? 'active' : ''}" title="Favoritar" onclick="event.stopPropagation(); toggleFavorito('${item.c}')">★</button>
+            <span class="feedback-badge">Copiado!</span>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function selecionarECopiar(codigo, tipo, elemento) {
+    const cidade = listaCidades.find(x => x.c === codigo);
+    if (!cidade) return;
+
+    if (tipo === 'origem') {
+      cidadeSelecionadaOri = cidade;
+      document.getElementById('oriView').textContent = `${cidade.n}/${cidade.u} (${cidade.c})`;
+      origemAguardandoTab = true;
+    } else {
+      cidadeSelecionadaDes = cidade;
+      document.getElementById('desView').textContent = `${cidade.n}/${cidade.u} (${cidade.c})`;
+    }
+
+    atualizarDiagnosticoFiscal();
+    const textoCopia = formatarTexto(cidade);
+    navigator.clipboard.writeText(textoCopia).then(() => {
+      if (elemento) {
+        elemento.classList.add('copied');
+        setTimeout(() => elemento.classList.remove('copied'), 900);
+      }
+    });
+  }
+
+  function copiarCaixaRota(tipo, elemento) {
+    const cidade = tipo === 'origem' ? cidadeSelecionadaOri : cidadeSelecionadaDes;
+    if (!cidade) return;
+    const textoCopia = formatarTexto(cidade);
+    navigator.clipboard.writeText(textoCopia).then(() => {
+      elemento.classList.add('copied');
+      setTimeout(() => elemento.classList.remove('copied'), 900);
+    });
+  }
+
+  function copiarRotaCompleta(btn) {
+    if (!cidadeSelecionadaOri || !cidadeSelecionadaDes) {
+      alert("Selecione a Origem e o Destino primeiro.");
+      return;
+    }
+    const rotaTexto = `Origem: ${cidadeSelecionadaOri.c} (${cidadeSelecionadaOri.n}/${cidadeSelecionadaOri.u}) ➔ Destino: ${cidadeSelecionadaDes.c} (${cidadeSelecionadaDes.n}/${cidadeSelecionadaDes.u})`;
+    navigator.clipboard.writeText(rotaTexto).then(() => {
+      const orig = btn.innerText;
+      btn.innerText = "✓ Copiada!";
+      setTimeout(() => btn.innerText = orig, 1200);
+    });
+  }
+
+  function abrirGoogleMaps() {
+    if (!cidadeSelecionadaOri || !cidadeSelecionadaDes) {
+      alert("Selecione a Origem e o Destino primeiro para traçar o mapa.");
+      return;
+    }
+    const o = encodeURIComponent(`${cidadeSelecionadaOri.n}, ${cidadeSelecionadaOri.u}`);
+    const d = encodeURIComponent(`${cidadeSelecionadaDes.n}, ${cidadeSelecionadaDes.u}`);
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${o}&destination=${d}`, '_blank');
+  }
+
+  function obterPrefixoOperacao() {
+    return (cidadeSelecionadaOri && cidadeSelecionadaDes && cidadeSelecionadaOri.u === cidadeSelecionadaDes.u) ? "5" : "6";
+  }
+
+  /* INICIALIZAÇÃO IMEDIATA E ROBUSTA */
+  try {
+    const salvo = localStorage.getItem('ibge_tema') || 'dark';
+    aplicarTema(salvo);
+  } catch(e) { aplicarTema('dark'); }
+
+  carregarEstadosModulosSalvos();
+  atualizarDescricaoCFOP('nfe');
+  atualizarDescricaoCFOP('cte');
+  carregarBaseIBGE();
+</script>
+</body>
+</html>
