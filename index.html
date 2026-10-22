@@ -81,6 +81,9 @@
     .btn-theme { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
     .btn-theme:hover { border-color: var(--brand-green); }
 
+    .offline-banner { display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 10px 16px; border-radius: 10px; font-size: 0.84rem; align-items: center; justify-content: space-between; gap: 12px; }
+    .offline-banner button { background: #ef4444; color: #fff; border: none; padding: 5px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+
     .top-controls { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
     @media (max-width: 900px) { .top-controls { grid-template-columns: 1fr; } }
 
@@ -188,7 +191,7 @@
 
     .depara-result-box { background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
     .depara-main-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    .depara-badge-old { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; padding: 6px 12px; border-radius: 6px; font-family: Consolas, monospace; font-weight: 800; font-size: 1.1rem; }
+    .depara-badge-old { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; padding: 6px 12px; border-radius: 6px; font-family: Consolas, monospace; font-weight: 800; font-size: 1.05rem; }
     .depara-badge-new { background: rgba(0, 200, 83, 0.2); border: 1.5px solid var(--brand-green); color: var(--brand-green-hover); padding: 6px 14px; border-radius: 6px; font-family: Consolas, monospace; font-weight: 800; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     .depara-badge-new:hover { background: var(--brand-green); color: #000; }
     .depara-desc-title { font-size: 0.88rem; font-weight: 700; color: var(--text-title); line-height: 1.35; }
@@ -228,13 +231,13 @@
       </button>
       <div class="status-badge">
         <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Carregando municípios...</span>
+        <span id="statusText">Iniciando...</span>
       </div>
     </div>
   </header>
 
   <div id="offlineBanner" class="offline-banner">
-    <span>⚠️ <strong>Modo Offline Ativo:</strong> Usando base local interna. Para sincronizar os 5.570 municípios do IBGE conecte à internet e clique em Tentar Novamente.</span>
+    <span>⚠️ <strong>Modo Offline Ativo:</strong> Usando base interna de segurança. Para sincronizar a lista completa de municípios do IBGE conecte-se à internet e clique em Tentar Novamente.</span>
     <button onclick="carregarBaseIBGE(true)">Tentar Novamente</button>
   </div>
 
@@ -270,7 +273,7 @@
             <button class="btn-clear-card" onclick="limparCard('origem')">Limpar</button>
           </div>
           <div class="search-row">
-            <input type="text" id="cidadeOrigem" class="input-cidade" placeholder="Cidade (ex: Campo Grande, Corumbá, Cascavel)..." oninput="filtrar('origem')" onkeydown="checarTeclas(event, 'origem')" autofocus>
+            <input type="text" id="cidadeOrigem" class="input-cidade" placeholder="Cidade (ex: Corumbá, Campo Grande, Cascavel)..." oninput="filtrar('origem')" onkeydown="checarTeclas(event, 'origem')" autofocus>
             <input type="text" id="ufOrigem" class="input-uf" placeholder="UF" maxlength="2" oninput="filtrar('origem')" onkeydown="checarTeclas(event, 'origem')">
           </div>
           <div class="search-hint">💡 [↑ / ↓] navega &bull; [Enter] seleciona &bull; [Tab] pula p/ Destino &bull; [Esc] limpa</div>
@@ -282,7 +285,7 @@
             <button class="btn-clear-card" onclick="limparCard('destino')">Limpar</button>
           </div>
           <div class="search-row">
-            <input type="text" id="cidadeDestino" class="input-cidade" placeholder="Cidade (ex: São Paulo, Santos, Santarém)..." oninput="filtrar('destino')" onkeydown="checarTeclas(event, 'destino')">
+            <input type="text" id="cidadeDestino" class="input-cidade" placeholder="Cidade (ex: São Paulo, Santos, Igarapé)..." oninput="filtrar('destino')" onkeydown="checarTeclas(event, 'destino')">
             <input type="text" id="ufDestino" class="input-uf" placeholder="UF" maxlength="2" oninput="filtrar('destino')" onkeydown="checarTeclas(event, 'destino')">
           </div>
           <div class="search-hint">💡 [↑ / ↓] navega &bull; [Enter] seleciona e copia &bull; [Esc] limpa</div>
@@ -384,10 +387,10 @@
     </div>
   </div>
 
-  <!-- 3. DE-PARA DE CÓDIGOS DE IMPOSTO -->
+  <!-- 3. DE-PARA DE CÓDIGOS DE IMPOSTO (BUSCA UNIVERSAL BIDIRECIONAL) -->
   <div class="depara-card">
     <div class="module-header">
-      <div class="module-title">🔄 De-Para de Códigos de Imposto <span>(Antigo ➔ Novo)</span></div>
+      <div class="module-title">🔄 Localizador de Códigos de Imposto <span>(Antigo ⇄ Novo ⇄ SAP)</span></div>
       <div class="module-actions">
         <button class="btn-add-slot" onclick="adicionarSlotDePara()">➕ Adicionar Código (+)</button>
         <button class="btn-toggle-module" id="btnCollapseDePara" onclick="alternarModulo('deparaBody', 'btnCollapseDePara', 'depara_col')">➖ Recolher Módulo</button>
@@ -401,7 +404,7 @@
             <button class="btn-remove-slot" style="background:var(--bg-card); color:var(--text-muted); border-color:var(--border);" onclick="limparSlotDePara(1)">✕ Limpar</button>
           </div>
           <div class="depara-input-row">
-            <input type="text" id="inputCodAntigo_1" class="input-cidade input-depara" placeholder="Digite código antigo ou descrição (ex: E00I00PC, VENDA, DIFAL, 2551-001)..." oninput="pesquisarImpostoSlot(1)">
+            <input type="text" id="inputCodAntigo_1" class="input-cidade input-depara" placeholder="Buscar por Cód. Antigo, Novo, CFOP ou Nome (ex: E12I00PC, SI0PC013, 5102, VENDA)..." oninput="pesquisarImpostoSlot(1)">
             <button class="btn-key-clear" onclick="limparSlotDePara(1)">Limpar</button>
           </div>
           <div class="depara-matches-container" id="deparaMatchesBox_1"></div>
@@ -409,12 +412,12 @@
             <div class="depara-main-row">
               <div class="depara-code-pair">
                 <div>
-                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo</div>
+                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo / Origem</div>
                   <span class="depara-badge-old" id="deparaValAntigo_1">--</span>
                 </div>
                 <span class="depara-arrow">➔</span>
                 <div>
-                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Novo Código (Clique p/ Copiar)</div>
+                  <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Código Novo SAP (Clique p/ Copiar)</div>
                   <div class="depara-badge-new" id="deparaValNovo_1" onclick="copiarNovoCodigoImposto(this, 1)">
                     <span id="deparaNovoTxt_1">--</span>
                     <span style="font-size:0.7rem; opacity:0.8;">📋</span>
@@ -426,15 +429,18 @@
                 <span class="badge badge-destino" id="deparaOperacao_1" style="font-size:0.8rem;">--</span>
               </div>
             </div>
-            <div class="depara-desc-title" id="deparaDescricao_1">Digite um código de imposto antigo acima para ver o novo formato e suas alíquotas.</div>
+            <div class="depara-desc-title" id="deparaDescricao_1">Digite um código antigo, código novo, CFOP ou palavra-chave acima.</div>
             <div class="depara-details-grid">
               <div class="depara-detail-item"><span class="depara-detail-lbl">ICMS</span><span class="depara-detail-val" id="deparaIcms_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">IPI</span><span class="depara-detail-val" id="deparaIpi_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">PIS</span><span class="depara-detail-val" id="deparaPis_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">COFINS</span><span class="depara-detail-val" id="deparaCofins_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">ISS</span><span class="depara-detail-val" id="deparaIss_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">Taxa Total SAP</span><span class="depara-detail-val" id="deparaTaxa_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Entrada</span><span class="depara-detail-val" id="deparaCfopE_1">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Saída</span><span class="depara-detail-val" id="deparaCfopS_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_1">--</span></div>
-              <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_1" style="font-size:0.75rem;">--</span></div>
+              <div class="depara-detail-item"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_1" style="font-size:0.75rem;">--</span></div>
             </div>
           </div>
         </div>
@@ -497,286 +503,265 @@
 </div>
 
 <script>
-  const ufsPrefix = {
-    "11":"RO","12":"AC","13":"AM","14":"RR","15":"PA","16":"AP","17":"TO",
-    "21":"MA","22":"PI","23":"CE","24":"RN","25":"PB","26":"PE","27":"AL",
-    "28":"SE","29":"BA","31":"MG","32":"ES","33":"RJ","35":"SP","41":"PR",
-    "42":"SC","43":"RS","50":"MS","51":"MT","52":"GO","53":"DF"
-  };
-
-  const sulSudesteSemES = ["SP", "RJ", "MG", "PR", "SC", "RS"];
-  const norteNordesteCO_ES = ["AC","AP","AM","PA","RO","RR","TO","AL","BA","CE","MA","PB","PE","PI","RN","SE","DF","GO","MT","MS","ES"];
-
-  /* Base offline pré-carregada para funcionamento sem internet */
-  const baseOfflinePadrao = [
-    {c:"5003207", n:"Corumbá", u:"MS"},
-    {c:"5002704", n:"Campo Grande", u:"MS"},
-    {c:"5005400", n:"Ladário", u:"MS"},
-    {c:"5003702", n:"Dourados", u:"MS"},
-    {c:"5007901", n:"Sidrolândia", u:"MS"},
-    {c:"5008305", n:"Três Lagoas", u:"MS"},
-    {c:"4104808", n:"Cascavel", u:"PR"},
-    {c:"4106902", n:"Curitiba", u:"PR"},
-    {c:"4113700", n:"Londrina", u:"PR"},
-    {c:"4115200", n:"Maringá", u:"PR"},
-    {c:"4118501", n:"Pato Branco", u:"PR"},
-    {c:"3550308", n:"São Paulo", u:"SP"},
-    {c:"3548500", n:"Santos", u:"SP"},
-    {c:"3552205", n:"Sorocaba", u:"SP"},
-    {c:"3551702", n:"Sertãozinho", u:"SP"},
-    {c:"3509502", n:"Campinas", u:"SP"},
-    {c:"3106200", n:"Belo Horizonte", u:"MG"},
-    {c:"3130101", n:"Igarapé", u:"MG"},
-    {c:"3118601", n:"Contagem", u:"MG"},
-    {c:"3106705", n:"Betim", u:"MG"},
-    {c:"3170206", n:"Uberlândia", u:"MG"},
-    {c:"3304557", n:"Rio de Janeiro", u:"RJ"},
-    {c:"5103403", n:"Cuiabá", u:"MT"},
-    {c:"5107602", n:"Rondonópolis", u:"MT"},
-    {c:"5208707", n:"Goiânia", u:"GO"},
-    {c:"5300108", n:"Brasília", u:"DF"}
-  ];
-
-  const dicionarioCFOP = {
-    "5101": "Venda de produção do estabelecimento no mesmo Estado.",
-    "6101": "Venda de produção do estabelecimento para outro Estado.",
-    "5102": "Venda de mercadoria adquirida ou recebida de terceiros no mesmo Estado.",
-    "6102": "Venda de mercadoria adquirida ou recebida de terceiros para outro Estado.",
-    "5103": "Venda de produção efetuada fora do estabelecimento no mesmo Estado.",
-    "6103": "Venda de produção efetuada fora do estabelecimento para outro Estado.",
-    "5104": "Venda de mercadoria de terceiros efetuada fora do estabelecimento no Estado.",
-    "6104": "Venda de mercadoria de terceiros fora do estabelecimento para outro Estado.",
-    "5401": "Venda de produção com mercadoria sujeita a Substituição Tributária (contribuinte substituto).",
-    "6401": "Venda interestadual de produção com mercadoria sujeita a Substituição Tributária.",
-    "5403": "Venda de mercadoria de terceiros com ST (contribuinte substituto).",
-    "6403": "Venda interestadual de mercadoria de terceiros com ST (contribuinte substituto).",
-    "5405": "Venda de mercadoria com ST na condição de contribuinte substituído (ICMS retido anteriormente).",
-    "6404": "Venda interestadual de mercadoria com ST na condição de contribuinte substituído.",
-    "5151": "Transferência de produção do estabelecimento para filial ou matriz no Estado.",
-    "6151": "Transferência de produção do estabelecimento para filial ou matriz em outro Estado.",
-    "5152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz no Estado.",
-    "6152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz em outro Estado.",
-    "5201": "Devolução de compra para industrialização no mesmo Estado.",
-    "6201": "Devolução interestadual de compra para industrialização.",
-    "5202": "Devolução de compra para comercialização no mesmo Estado.",
-    "6202": "Devolução interestadual de compra para comercialização.",
-    "5949": "Outra saída de mercadoria ou prestação de serviço não especificada no Estado.",
-    "6949": "Outra saída de mercadoria ou prestação de serviço não especificada para outro Estado.",
-    "5352": "Prestação de serviço de transporte a estabelecimento industrial no Estado.",
-    "6352": "Prestação de serviço de transporte a estabelecimento industrial em outro Estado.",
-    "5353": "Prestação de serviço de transporte a estabelecimento comercial no Estado.",
-    "6353": "Prestação de serviço de transporte a estabelecimento comercial em outro Estado.",
-    "5354": "Prestação de serviço de transporte para redespacho no Estado.",
-    "6354": "Prestação interestadual de transporte para redespacho.",
-    "5357": "Prestação de serviço de transporte a não contribuinte ou não tomador no Estado.",
-    "6357": "Prestação interestadual de transporte a não contribuinte ou não tomador."
-  };
-
-  /* Base de 203 Códigos de Imposto Rigorosamente Estruturada */
+  /* Base Unificada de 257 Códigos de Imposto */
   const dbImpostos = [
-    ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%"],
-    ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%"],
-    ["2556-002","DI000003","DI000","DIFAL","7%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%"],
-    ["2556-003","DI000004","DI000","DIFAL","12%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 12% - IPI 0% - PIS COFINS 0%"],
-    ["E00000AT","EA000001","EA0000","Ativo","-","-","-","-","-","IC-IP-PISEX-COEX","SEM CRÉDITO ICMS 0% - IPI 0% - PIS 0% - COF 0% - IMOBILIZADO: ESCRITÓRIO/INFORMATICA/VEICULOS"],
-    ["E0004AT","EAI0PC01","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
-    ["E0007AT","EAI0PC02","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
-    ["E0012AT","EAI0PC03","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
-    ["E0017AT","EAI0PC04","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES"],
-    ["E00I00AT","EA00PC01","EA00PC","Ativo","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E00I00EX","EO000001","EO0000","Entrada outros","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% - FIM EXP EXPOR"],
-    ["E00I00NN","E0000001","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%"],
-    ["E00I00PC","E00PC001","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["E00I00PF","E0000002","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 0% - IPI 0% - PIS 0% - COFINS 0%"],
-    ["E00I05NN","E0I00001","E0I00","Entrada","-","5%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 5% PIS 0,00% COFINS 0,00%"],
-    ["E00I15NN","E0I00002","E0I00","Entrada","-","15%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 15% PIS 0,00% COFINS 0,00%"],
-    ["E04I00AT","EAI0PC05","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E04I00PC","EI0PC001","EI0PC","Entrada","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E04I00SC","EI000001","EI000","Entrada","4%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 0% COFINS % Sem IPI/PIS/COFINS"],
-    ["E07ATred","EAI0PC06","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7%-BC Red.26,57%  IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["E07I00AT","EAI0PC07","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E07I00NN","EI000002","EI000","Entrada","7%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 0% COFINS 0%"],
-    ["E07I00PC","EI0PC002","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E07I05PC","EIIPC001","EIIPC","Entrada","7%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 5% PIS 1,65% COFINS 7,60%"],
-    ["E07I10PC","EIIPC002","EIIPC","Entrada","7%","7,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 7,5% PIS 1,65% COFINS 7,60%"],
-    ["E07I35NN","EII00001","EII00","Entrada","7%","3,25%","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 0% COFINS 0%"],
-    ["E07I35PC","EIIPC003","EIIPC","Entrada","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 1,65% COFINS 7,60%"],
-    ["E07I65PC","EIIPC004","EIIPC","Entrada","7%","6,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 6,5% PIS 1,65% COFINS 7,60%"],
-    ["E1101001","E00PC002","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
-    ["E1101023","E0000003","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BT - COFINS 0 % - BT"],
-    ["E1125001","E00PC003","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1125 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,60 % - BT"],
-    ["E12I00AT","EAI0PC08","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E12I00NN","EI000003","EI000","Entrada","12%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
-    ["E12I00PC","EI0PC003","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E12I00PF","EI000004","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12% - IPI 0% - PIS 0% - COFINS 0%"],
-    ["E13I00AT","EAI0PC09","EAI0PC","Ativo","13,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 13,3% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E14I00PC","EI0PC004","EI0PC","Entrada","14%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 14% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E15I00PC","EI0PC005","EI0PC","Entrada","15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 15% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E17I00AT","EAI0PC10","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["E17I00NN","EI000005","EI000","Entrada","17%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["E17I00PC","EI0PC006","EI0PC","Entrada","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["E17I00ST","EI000006","EI000","Entrada","17%","-","-","-","-","IC-IP-PI-CF-STAL","ICMS ST 17% IPI 0% PIS 0% COFINS 0%"],
-    ["E17I05PC","EIIPC005","EIIPC","Entrada","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60%"],
-    ["E2101001","EI0PC007","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 7 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
-    ["E2101002","E00PC004","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
-    ["E2101023","EI0PC008","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 12 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT"],
-    ["E2101025","EI000007","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI"],
-    ["E3949001","E0000004","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","3949 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI"],
-    ["ENERGIA","EG00PC01","EG00PC","Energia","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["ESN125PC","ESI0PC01","ESI0PC","Simples nacional","1,25%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,25% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN134PC","ESI0PC02","ESI0PC","Simples nacional","1,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,34% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN136PC","ESI0PC03","ESI0PC","Simples nacional","1,36%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,36% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN144PC","ESI0PC04","ESI0PC","Simples nacional","1,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,44% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN164PC","ESI0PC05","ESI0PC","Simples nacional","1,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,64% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN182PC","ESI0PC06","ESI0PC","Simples nacional","1,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,815% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN194PC","ESI0PC07","ESI0PC","Simples nacional","1,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,94% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN210PC","ESI0PC08","ESI0PC","Simples nacional","2,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,10% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN217PC","ESI0PC09","ESI0PC","Simples nacional","2,17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,17% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["ESN220PC","ESI0PC10","ESI0PC","Simples nacional","2,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,20% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN230PC","ESI0PC11","ESI0PC","Simples nacional","2,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,30% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN232PC","ESI0PC12","ESI0PC","Simples nacional","2,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,32% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN233AT","EAI0PC11","EAI0PC","Ativo","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN233PC","ESI0PC13","ESI0PC","Simples nacional","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN234PC","ESI0PC14","ESI0PC","Simples nacional","2,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,34% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN238PC","ESI0PC15","ESI0PC","Simples nacional","2,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,38% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN243PC","ESI0PC16","ESI0PC","Simples nacional","2,43%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,43% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN247PC","ESI0PC17","ESI0PC","Simples nacional","2,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,47% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN248PC","ESI0PC18","ESI0PC","Simples nacional","2,48%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,48% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN249PC","ESI0PC19","ESI0PC","Simples nacional","2,49%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,49% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN252PC","ESI0PC20","ESI0PC","Simples nacional","2,52%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,52% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN256PC","ESI0PC21","ESI0PC","Simples nacional","2,56%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,56% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN257PC","ESI0PC22","ESI0PC","Simples nacional","2,57%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,57% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN259PC","ESI0PC23","ESI0PC","Simples nacional","2,59%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,59% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN266PC","ESI0PC24","ESI0PC","Simples nacional","2,66%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,66% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN268PC","ESI0PC25","ESI0PC","Simples nacional","2,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,68% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN272PC","ESI0PC26","ESI0PC","Simples nacional","2,72%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,72% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN273PC","ESI0PC27","ESI0PC","Simples nacional","2,73%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,73% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN280PC","ESI0PC28","ESI0PC","Simples nacional","2,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,80% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN283PC","ESI0PC29","ESI0PC","Simples nacional","2,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,83% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN284AT","EAI0PC12","EAI0PC","Ativo","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN284PC","ESI0PC30","ESI0PC","Simples nacional","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN285PC","ESI0PC31","ESI0PC","Simples nacional","2,85%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,85% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN289PC","ESI0PC32","ESI0PC","Simples nacional","2,89%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,89% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN293PC","ESI0PC33","ESI0PC","Simples nacional","2,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,93% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN294PC","ESI0PC34","ESI0PC","Simples nacional","2,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,94% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN295PC","ESI0PC35","ESI0PC","Simples nacional","2,95%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,95% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN296PC","ESI0PC36","ESI0PC","Simples nacional","2,96%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,96% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN297PC","ESI0PC37","ESI0PC","Simples nacional","2,97%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,97% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN303PC","ESI0PC38","ESI0PC","Simples nacional","3,03%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,03% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN304PC","ESI0PC39","ESI0PC","Simples nacional","3,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,04% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN305PC","ESI0PC40","ESI0PC","Simples nacional","3,05%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,05% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN307AT","EAI0PC13","EAI0PC","Ativo","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,07 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN307PC","ESI0PC41","ESI0PC","Simples nacional","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,07% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN310AT","EAI0PC14","EAI0PC","Ativo","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,10 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN310PC","ESI0PC42","ESI0PC","Simples nacional","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,10% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN312PC","ESI0PC43","ESI0PC","Simples nacional","3,12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,12% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN313AT","EAI0PC15","EAI0PC","Ativo","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN313PC","ESI0PC44","ESI0PC","Simples nacional","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN315PC","ESI0PC45","ESI0PC","Simples nacional","3,15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,15% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN316PC","ESI0PC46","ESI0PC","Simples nacional","3,16%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,16% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN320PC","ESI0PC47","ESI0PC","Simples nacional","3,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,20% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN323PC","ESI0PC48","ESI0PC","Simples nacional","3,23%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,23% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN327PC","ESI0PC49","ESI0PC","Simples nacional","3,27%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,27% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN328AT","EAI0PC16","EAI0PC","Ativo","3,28%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,28% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN332PC","ESI0PC50","ESI0PC","Simples nacional","3,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,32% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN337PC","ESI0PC51","ESI0PC","Simples nacional","3,37%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,37% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN338PC","ESI0PC52","ESI0PC","Simples nacional","3,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,38% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN341AT","EAI0PC17","EAI0PC","Ativo","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN341PC","ESI0PC53","ESI0PC","Simples nacional","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN343PC","ESI0PC54","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN344PC","ESI0PC55","ESI0PC","Simples nacional","3,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,44% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN345PC","ESI0PC56","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN347PC","ESI0PC57","ESI0PC","Simples nacional","3,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,47% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN350PC","ESI0PC58","ESI0PC","Simples nacional","3,50%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,50% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN355PC","ESI0PC59","ESI0PC","Simples nacional","3,55%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,55% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN358PC","ESI0PC60","ESI0PC","Simples nacional","3,58%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,58% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN364PC","ESI0PC61","ESI0PC","Simples nacional","3,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,64% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN365PC","ESI0PC62","ESI0PC","Simples nacional","3,65%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,65% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN367PC","ESI0PC63","ESI0PC","Simples nacional","3,67%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,67% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN368PC","ESI0PC64","ESI0PC","Simples nacional","3,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,68% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN369PC","ESI0PC65","ESI0PC","Simples nacional","3,69%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,69% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN371PC","ESI0PC66","ESI0PC","Simples nacional","3,71%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,71% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN375PC","ESI0PC67","ESI0PC","Simples nacional","3,75%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,75% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN376PC","ESI0PC68","ESI0PC","Simples nacional","3,76%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,76% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN380PC","ESI0PC69","ESI0PC","Simples nacional","3,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,80% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN381PC","ESI0PC70","ESI0PC","Simples nacional","3,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,81% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN383PC","ESI0PC71","ESI0PC","Simples nacional","3,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,83% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN384AT","EAI0PC18","EAI0PC","Ativo","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN384PC","ESI0PC72","ESI0PC","Simples nacional","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN388PC","ESI0PC73","ESI0PC","Simples nacional","3,88%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,88% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN393PC","ESI0PC74","ESI0PC","Simples nacional","3,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,93% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN394AT","EAI0PC19","EAI0PC","Ativo","3,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,94% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN399AT","EAI0PC20","EAI0PC","Ativo","3,99%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,99% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS"],
-    ["ESN400AT","EAI0PC21","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS"],
-    ["ESN400PC","ESI0PC75","ESI0PC","Simples nacional","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,00% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN404PC","ESI0PC76","ESI0PC","Simples nacional","4,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,04% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN890PC","ESI0PC77","ESI0PC","Simples nacional","8,90%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 8,90% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["ESN900PC","ESI0PC78","ESI0PC","Simples nacional","9%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 9,00% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["FIX012","SOI0PC01","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF - fixo","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["IC-00001","CI000001","CI000","Complemento","4%","-","-","-","-","ICMS","Complemento de ICMS"],
-    ["IC-00002","CI000002","CI000","Complemento","7%","-","-","-","-","ICMS","Complemento ICMS 7%"],
-    ["IC-00003","CI000003","CI000","Complemento","3%","-","-","-","-","ICMS","Complemento de ICMS"],
-    ["IC-00004","CI000004","CI000","Complemento","17%","-","-","-","-","ICMS","Complemento ICMS 17%"],
-    ["IC-00325","C0I00001","C0I00","Complemento","-","3,25%","-","-","-","IPI","Complemento de IPI"],
-    ["IC000012","CI000005","CI000","Complemento","12%","-","-","-","-","ICMS","Complemento de ICMS"],
-    ["IC100012","CI000006","CI000","Complemento","12%","-","-","-","-","-","Complemento de ICMS BC 100%"],
-    ["IMP 00","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 0% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%"],
-    ["IMP 01","EI00PC01","EI00PC","Importação","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 10,65%"],
-    ["IMP 12,6","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12,60% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%"],
-    ["IMP II 2","EI0IPC01","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 2% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%"],
-    ["IMP II12","EI0IPC02","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%"],
-    ["IMP II96","EI0IPC03","EI0IPC","Importação","-","6,50%","2,10%","9,65%","-","II-IC-IP-PI-CF2","II 96% ICMS 0% IPI 65% PIS 2,10% COFINS 9,65%"],
-    ["S00000VL","SPCIS001","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS"],
-    ["S00001VL","SPCIS002","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS"],
-    ["S00I0051","S0000001","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ICMS Diferido"],
-    ["S00I00IM","S00PC001","S00PC","Saída","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 9,65%"],
-    ["S00I00NN","S0000002","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%"],
-    ["S00I00PC","S00PC002","S00PC","Saída","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["S00I00VE","S00PC003","S00PC","Saída","-","-","0,65%","3%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0,65% COFINS 3,00%"],
-    ["S04I00NN","SI000001","SI000","Saída","4%","-","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 0% PIS 0% COFINS 0%"],
-    ["S04I00PC","SI0PC001","SI0PC","Saída","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S04I10NN","SII00001","SII00","Saída","4%","10%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 10% PIS 0% COFINS 0%"],
-    ["S04I65NN","SII00002","SII00","Saída","4%","6,50%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 6,5% PIS 0% COFINS 0%"],
-    ["S07I00NN","SI000002","SI000","Saída","7%","-","-","-","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 0% COFINS 0%"],
-    ["S07I00PC","SI0PC002","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S07I325","SIIPC001","SIIPC","Saída","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS"],
-    ["S07I325N","SII00003","SII00","Saída","7%","3,25%","-","-","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 0% COFINS 0% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS"],
-    ["S12I00MG","SI0PC003","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S12I00NN","SI000003","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
-    ["S12I00PC","SI0PC004","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S12I00RR","SI000004","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%"],
-    ["S12I00TR","SI000005","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFI 0% TRANSF MS P/ MG"],
-    ["S12I05PC","SIIPC002","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S12I0PC","SI0PC005","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S12I10NN","SII00004","SII00","Saída","12%","10%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 10% PIS 0% COFINS 0%"],
-    ["S12I325","SIIPC003","SIIPC","Saída","12%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S12I375","SIIPC004","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S12I375N","SII00005","SII00","Saída","12%","3,75%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 0% COFINS 0%"],
-    ["S12I375P","SIIPC005","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S12I5PC","SIIPC006","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S12IPCPA","SI0PC006","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S17I00B1","SI000006","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["S17I00IM","SI0PC007","SI0PC","Saída","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 9,65%"],
-    ["S17I00MM","SI0PC008","SI0PC","Saída","17%","-","2,10%","10,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 10,65%"],
-    ["S17I00NN","SI000007","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["S17I00PC","SI0PC009","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S17I00R2","SI000008","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["S17I00RB","SI000009","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["S17I05PC","SIIPC007","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S17I0PC","SI0PC010","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S17I325M","SIIPC008","SIIPC","Saída","17%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS BC PIS/COFINS"],
-    ["S17I375","SIIPC009","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S17I375P","SIIPC010","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S17I5PC","SIIPC011","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["S17IBC70","SI000010","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%"],
-    ["S18I00PC","SI0PC011","SI0PC","Saída","18%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 18% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins"],
-    ["S7I0PC","SI0PC012","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS"],
-    ["SERV-IMO","EA000002","EA0000","Ativo","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ATIVO FIXO"],
-    ["SINISTRO","SO00PC01","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% - Sinistro"],
-    ["TESTE","SO00PC02","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IP-IC-PI-CF S/ ICMS","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%"],
-    ["VEN ORFE","SOI0PC02","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["VEND GV2","SO00PC03","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%"],
-    ["VENDA GV","SOI0PC03","SOI0PC","Saída outros","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%"]
+    ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%","30,00%","2551","6551"],
+    ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%","25,00%","2556","6556"],
+    ["2556-002","DI000003","DI000","DIFAL","7%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%","25,00%","2556","6556"],
+    ["2556-003","DI000004","DI000","DIFAL","12%","-","-","-","-","DIFAL POR DENTRO","DIFAL - ICMS 17% - 12% - IPI 0% - PIS COFINS 0%","22,00%","2556","6556"],
+    ["E00000AT","EA000001","EA0000","Ativo","-","-","-","-","-","IC-IP-PISEX-COEX","SEM CRÉDITO ICMS 0% - IPI 0% - PIS 0% - COF 0% - IMOBILIZADO: ESCRITÓRIO/INFORMATICA/VEICULOS","0,00%","1551","5551"],
+    ["E0004AT","EAI0PC01","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES","13,25%","1551","5551"],
+    ["E0007AT","EAI0PC02","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES","16,25%","1551","5551"],
+    ["E0012AT","EAI0PC03","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES","21,25%","1551","5551"],
+    ["E0017AT","EAI0PC04","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% - IPI 0% - PIS 1,65% - COFINS 7,60% - IMOBILIZADO: EDIFICAÇÕES/INSTALAÇÕES","26,25%","1551","5551"],
+    ["E00I00AT","EA00PC01","EA00PC","Ativo","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","10,25%","1000","5000"],
+    ["E00I00EX","EO000001","EO0000","Entrada outros","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% - FIM EXP EXPOR","0,00%","2501","6501"],
+    ["E00I00NN","E0000001","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","7000"],
+    ["E00I00PC","E00PC001","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%","10,25%","1100","7000"],
+    ["E00I00PF","E0000002","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 0% - IPI 0% - PIS 0% - COFINS 0%","0,00%","2101","6201"],
+    ["E00I05NN","E0I00001","E0I00","Entrada","-","5%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 5% PIS 0,00% COFINS 0,00%","6,00%","1000","5000"],
+    ["E00I15NN","E0I00002","E0I00","Entrada","-","15%","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 15% PIS 0,00% COFINS 0,00%","16,00%","1000","5000"],
+    ["E04I00AT","EAI0PC05","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","13,25%","1551","5551"],
+    ["E04I00PC","EI0PC001","EI0PC","Entrada","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60%","14,25%","1101","5101"],
+    ["E04I00SC","EI000001","EI000","Entrada","4%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 0% COFINS % Sem IPI/PIS/COFINS","4,00%","1101","5101"],
+    ["E07ATred","EAI0PC06","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7%-BC Red.26,57%  IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","16,25%","1551","5551"],
+    ["E07I00AT","EAI0PC07","EAI0PC","Ativo","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","16,25%","1551","5551"],
+    ["E07I00NN","EI000002","EI000","Entrada","7%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 0% COFINS 0%","7,00%","1101","5101"],
+    ["E07I00PC","EI0PC002","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60%","17,25%","1101","5101"],
+    ["E07I05PC","EIIPC001","EIIPC","Entrada","7%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 5% PIS 1,65% COFINS 7,60%","22,25%","1101","5101"],
+    ["E07I10PC","EIIPC002","EIIPC","Entrada","7%","7,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 7,5% PIS 1,65% COFINS 7,60%","24,75%","1101","5101"],
+    ["E07I35NN","EII00001","EII00","Entrada","7%","3,25%","-","-","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 0% COFINS 0%","10,25%","1101","5101"],
+    ["E07I35PC","EIIPC003","EIIPC","Entrada","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 3,25% PIS 1,65% COFINS 7,60%","20,50%","1101","5101"],
+    ["E07I65PC","EIIPC004","EIIPC","Entrada","7%","6,50%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 6,5% PIS 1,65% COFINS 7,60%","23,75%","1101","5101"],
+    ["E1101001","E00PC002","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","10,25%","1101","5201"],
+    ["E1101023","E0000003","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","1101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BT - COFINS 0 % - BT","0,00%","1101","5201"],
+    ["E1125001","E00PC003","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","1125 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,60 % - BT","10,25%","1125","5125"],
+    ["E12I00AT","EAI0PC08","EAI0PC","Ativo","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","21,25%","1551","5551"],
+    ["E12I00NN","EI000003","EI000","Entrada","12%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 0% COFINS 0%","12,00%","1101","5101"],
+    ["E12I00PC","EI0PC003","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%","22,25%","1101","5101"],
+    ["E12I00PF","EI000004","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12% - IPI 0% - PIS 0% - COFINS 0%","12,00%","2101","6201"],
+    ["E13I00AT","EAI0PC09","EAI0PC","Ativo","13,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 13,3% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","22,55%","1551","5551"],
+    ["E14I00PC","EI0PC004","EI0PC","Entrada","14%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 14% IPI 0% PIS 1,65% COFINS 7,60%","24,25%","1101","5101"],
+    ["E15I00PC","EI0PC005","EI0PC","Entrada","15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 15% IPI 0% PIS 1,65% COFINS 7,60%","25,25%","1101","5101"],
+    ["E17I00AT","EAI0PC10","EAI0PC","Ativo","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","26,25%","1551","5551"],
+    ["E17I00NN","EI000005","EI000","Entrada","17%","-","-","-","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 0% COFINS 0%","17,00%","1101","5101"],
+    ["E17I00PC","EI0PC006","EI0PC","Entrada","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%","27,25%","1101","5101"],
+    ["E17I00ST","EI000006","EI000","Entrada","17%","-","-","-","-","IC-IP-PI-CF-STAL","ICMS ST 17% IPI 0% PIS 0% COFINS 0%","17,00%","1101","5101"],
+    ["E17I05PC","EIIPC005","EIIPC","Entrada","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60%","32,25%","1101","5101"],
+    ["E2101001","EI0PC007","EI0PC","Entrada","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 7 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","17,25%","2101","6101"],
+    ["E2101002","E00PC004","E00PC","Entrada","-","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","10,25%","2101","6201"],
+    ["E2101023","EI0PC008","EI0PC","Entrada","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","2101 - ICMS 12 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","22,25%","2101","6101"],
+    ["E2101025","EI000007","EI000","Entrada","12%","-","-","-","-","IC-IP-PI-CF","2101 - ICMS 12 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","12,00%","2101","6201"],
+    ["E3949001","E0000004","E0000","Entrada","-","-","-","-","-","IC-IP-PI-CF","3949 - ICMS 0 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","0,00%","3949","7949"],
+    ["ENERGIA","EG00PC01","EG00PC","Energia","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%","10,25%","1253","5253"],
+    ["ESN125PC","ESI0PC01","ESI0PC","Simples nacional","1,25%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,25% IPI 0% PIS ,165% COFINS 7,60%","10,50%","1102","5102"],
+    ["ESN134PC","ESI0PC02","ESI0PC","Simples nacional","1,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,34% IPI 0% PIS ,165% COFINS 7,60%","10,59%","1102","5102"],
+    ["ESN136PC","ESI0PC03","ESI0PC","Simples nacional","1,36%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,36% IPI 0% PIS ,165% COFINS 7,60%","10,61%","1102","5102"],
+    ["ESN144PC","ESI0PC04","ESI0PC","Simples nacional","1,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,44% IPI 0% PIS ,165% COFINS 7,60%","10,69%","1102","5102"],
+    ["ESN164PC","ESI0PC05","ESI0PC","Simples nacional","1,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,64% IPI 0% PIS ,165% COFINS 7,60%","10,89%","1102","5102"],
+    ["ESN182PC","ESI0PC06","ESI0PC","Simples nacional","1,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,815% IPI 0% PIS ,165% COFINS 7,60%","11,06%","1102","5102"],
+    ["ESN194PC","ESI0PC07","ESI0PC","Simples nacional","1,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 1,94% IPI 0% PIS ,165% COFINS 7,60%","11,19%","1102","5102"],
+    ["ESN210PC","ESI0PC08","ESI0PC","Simples nacional","2,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,10% IPI 0% PIS ,165% COFINS 7,60%","11,35%","1102","5102"],
+    ["ESN217PC","ESI0PC09","ESI0PC","Simples nacional","2,17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,17% IPI 0% PIS 1,65% COFINS 7,60%","11,42%","1102","5102"],
+    ["ESN220PC","ESI0PC10","ESI0PC","Simples nacional","2,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,20% IPI 0% PIS ,165% COFINS 7,60%","11,45%","1102","5102"],
+    ["ESN230PC","ESI0PC11","ESI0PC","Simples nacional","2,30%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,30% IPI 0% PIS ,165% COFINS 7,60%","11,55%","1102","5102"],
+    ["ESN232PC","ESI0PC12","ESI0PC","Simples nacional","2,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,32% IPI 0% PIS ,165% COFINS 7,60%","11,57%","1102","5102"],
+    ["ESN233AT","EAI0PC11","EAI0PC","Ativo","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","11,58%","1551","5551"],
+    ["ESN233PC","ESI0PC13","ESI0PC","Simples nacional","2,33%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,33% IPI 0% PIS ,165% COFINS 7,60%","11,58%","1102","5102"],
+    ["ESN234PC","ESI0PC14","ESI0PC","Simples nacional","2,34%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,34% IPI 0% PIS ,165% COFINS 7,60%","11,59%","1102","5102"],
+    ["ESN238PC","ESI0PC15","ESI0PC","Simples nacional","2,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,38% IPI 0% PIS ,165% COFINS 7,60%","11,63%","1102","5102"],
+    ["ESN243PC","ESI0PC16","ESI0PC","Simples nacional","2,43%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,43% IPI 0% PIS ,165% COFINS 7,60%","11,68%","1102","5102"],
+    ["ESN247PC","ESI0PC17","ESI0PC","Simples nacional","2,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,47% IPI 0% PIS ,165% COFINS 7,60%","11,72%","1102","5102"],
+    ["ESN248PC","ESI0PC18","ESI0PC","Simples nacional","2,48%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,48% IPI 0% PIS ,165% COFINS 7,60%","11,73%","1102","5102"],
+    ["ESN249PC","ESI0PC19","ESI0PC","Simples nacional","2,49%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,49% IPI 0% PIS ,165% COFINS 7,60%","11,74%","1102","5102"],
+    ["ESN252PC","ESI0PC20","ESI0PC","Simples nacional","2,52%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,52% IPI 0% PIS ,165% COFINS 7,60%","11,77%","1102","5102"],
+    ["ESN256PC","ESI0PC21","ESI0PC","Simples nacional","2,56%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,56% IPI 0% PIS ,165% COFINS 7,60%","11,81%","1102","5102"],
+    ["ESN257PC","ESI0PC22","ESI0PC","Simples nacional","2,57%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,57% IPI 0% PIS ,165% COFINS 7,60%","11,82%","1102","5102"],
+    ["ESN259PC","ESI0PC23","ESI0PC","Simples nacional","2,59%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,59% IPI 0% PIS ,165% COFINS 7,60%","11,84%","1102","5102"],
+    ["ESN266PC","ESI0PC24","ESI0PC","Simples nacional","2,66%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,66% IPI 0% PIS ,165% COFINS 7,60%","11,91%","1102","5102"],
+    ["ESN268PC","ESI0PC25","ESI0PC","Simples nacional","2,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,68% IPI 0% PIS ,165% COFINS 7,60%","11,93%","1102","5102"],
+    ["ESN272PC","ESI0PC26","ESI0PC","Simples nacional","2,72%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,72% IPI 0% PIS ,165% COFINS 7,60%","11,97%","1102","5102"],
+    ["ESN273PC","ESI0PC27","ESI0PC","Simples nacional","2,73%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,73% IPI 0% PIS ,165% COFINS 7,60%","11,98%","1102","5102"],
+    ["ESN280PC","ESI0PC28","ESI0PC","Simples nacional","2,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,80% IPI 0% PIS ,165% COFINS 7,60%","12,05%","1102","5102"],
+    ["ESN283PC","ESI0PC29","ESI0PC","Simples nacional","2,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,83% IPI 0% PIS ,165% COFINS 7,60%","12,08%","1102","5102"],
+    ["ESN284AT","EAI0PC12","EAI0PC","Ativo","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60% - IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,09%","1551","5551"],
+    ["ESN284PC","ESI0PC30","ESI0PC","Simples nacional","2,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,84% IPI 0% PIS ,165% COFINS 7,60%","12,09%","1102","5102"],
+    ["ESN285PC","ESI0PC31","ESI0PC","Simples nacional","2,85%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,85% IPI 0% PIS ,165% COFINS 7,60%","12,10%","1102","5102"],
+    ["ESN289PC","ESI0PC32","ESI0PC","Simples nacional","2,89%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,89% IPI 0% PIS ,165% COFINS 7,60%","12,14%","1102","5102"],
+    ["ESN293PC","ESI0PC33","ESI0PC","Simples nacional","2,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,93% IPI 0% PIS ,165% COFINS 7,60%","12,18%","1102","5102"],
+    ["ESN294PC","ESI0PC34","ESI0PC","Simples nacional","2,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,94% IPI 0% PIS ,165% COFINS 7,60%","12,19%","1102","5102"],
+    ["ESN295PC","ESI0PC35","ESI0PC","Simples nacional","2,95%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,95% IPI 0% PIS ,165% COFINS 7,60%","12,20%","1102","5102"],
+    ["ESN296PC","ESI0PC36","ESI0PC","Simples nacional","2,96%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,96% IPI 0% PIS ,165% COFINS 7,60%","12,21%","1102","5102"],
+    ["ESN297PC","ESI0PC37","ESI0PC","Simples nacional","2,97%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 2,97% IPI 0% PIS ,165% COFINS 7,60%","12,22%","1102","5102"],
+    ["ESN303PC","ESI0PC38","ESI0PC","Simples nacional","3,03%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,03% IPI 0% PIS ,165% COFINS 7,60%","12,28%","1102","5102"],
+    ["ESN304PC","ESI0PC39","ESI0PC","Simples nacional","3,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,04% IPI 0% PIS ,165% COFINS 7,60%","12,29%","1102","5102"],
+    ["ESN305PC","ESI0PC40","ESI0PC","Simples nacional","3,05%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,05% IPI 0% PIS ,165% COFINS 7,60%","12,30%","1102","5102"],
+    ["ESN307AT","EAI0PC13","EAI0PC","Ativo","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,07 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,32%","1551","5551"],
+    ["ESN307PC","ESI0PC41","ESI0PC","Simples nacional","3,07%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,07% IPI 0% PIS ,165% COFINS 7,60%","12,32%","1102","5102"],
+    ["ESN310AT","EAI0PC14","EAI0PC","Ativo","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,10 % IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,35%","1551","5551"],
+    ["ESN310PC","ESI0PC42","ESI0PC","Simples nacional","3,10%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,10% IPI 0% PIS ,165% COFINS 7,60%","12,35%","1102","5102"],
+    ["ESN312PC","ESI0PC43","ESI0PC","Simples nacional","3,12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,12% IPI 0% PIS ,165% COFINS 7,60%","12,37%","1102","5102"],
+    ["ESN313AT","EAI0PC15","EAI0PC","Ativo","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,38%","1551","5551"],
+    ["ESN313PC","ESI0PC44","ESI0PC","Simples nacional","3,13%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,13% IPI 0% PIS ,165% COFINS 7,60%","12,38%","1102","5102"],
+    ["ESN315PC","ESI0PC45","ESI0PC","Simples nacional","3,15%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,15% IPI 0% PIS ,165% COFINS 7,60%","12,40%","1102","5102"],
+    ["ESN316PC","ESI0PC46","ESI0PC","Simples nacional","3,16%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,16% IPI 0% PIS ,165% COFINS 7,60%","12,41%","1102","5102"],
+    ["ESN320PC","ESI0PC47","ESI0PC","Simples nacional","3,20%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,20% IPI 0% PIS ,165% COFINS 7,60%","12,45%","1102","5102"],
+    ["ESN323PC","ESI0PC48","ESI0PC","Simples nacional","3,23%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,23% IPI 0% PIS ,165% COFINS 7,60%","12,48%","1102","5102"],
+    ["ESN327PC","ESI0PC49","ESI0PC","Simples nacional","3,27%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,27% IPI 0% PIS ,165% COFINS 7,60%","12,52%","1102","5102"],
+    ["ESN328AT","EAI0PC16","EAI0PC","Ativo","3,28%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,28% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,53%","1551","5551"],
+    ["ESN332PC","ESI0PC50","ESI0PC","Simples nacional","3,32%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,32% IPI 0% PIS ,165% COFINS 7,60%","12,57%","1102","5102"],
+    ["ESN337PC","ESI0PC51","ESI0PC","Simples nacional","3,37%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,37% IPI 0% PIS ,165% COFINS 7,60%","12,62%","1102","5102"],
+    ["ESN338PC","ESI0PC52","ESI0PC","Simples nacional","3,38%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,38% IPI 0% PIS ,165% COFINS 7,60%","12,63%","1102","5102"],
+    ["ESN341AT","EAI0PC17","EAI0PC","Ativo","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","12,66%","1551","5551"],
+    ["ESN341PC","ESI0PC53","ESI0PC","Simples nacional","3,41%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,41% IPI 0% PIS ,165% COFINS 7,60%","12,66%","1102","5102"],
+    ["ESN343PC","ESI0PC54","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%","12,70%","1102","5102"],
+    ["ESN344PC","ESI0PC55","ESI0PC","Simples nacional","3,44%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,44% IPI 0% PIS ,165% COFINS 7,60%","12,69%","1102","5102"],
+    ["ESN345PC","ESI0PC56","ESI0PC","Simples nacional","3,45%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,45% IPI 0% PIS ,165% COFINS 7,60%","12,70%","1102","5102"],
+    ["ESN347PC","ESI0PC57","ESI0PC","Simples nacional","3,47%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,47% IPI 0% PIS ,165% COFINS 7,60%","12,72%","1102","5102"],
+    ["ESN350PC","ESI0PC58","ESI0PC","Simples nacional","3,50%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,50% IPI 0% PIS ,165% COFINS 7,60%","12,75%","1102","5102"],
+    ["ESN355PC","ESI0PC59","ESI0PC","Simples nacional","3,55%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,55% IPI 0% PIS ,165% COFINS 7,60%","12,80%","1102","5102"],
+    ["ESN358PC","ESI0PC60","ESI0PC","Simples nacional","3,58%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,58% IPI 0% PIS ,165% COFINS 7,60%","12,83%","1102","5102"],
+    ["ESN364PC","ESI0PC61","ESI0PC","Simples nacional","3,64%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,64% IPI 0% PIS ,165% COFINS 7,60%","12,89%","1102","5102"],
+    ["ESN365PC","ESI0PC62","ESI0PC","Simples nacional","3,65%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,65% IPI 0% PIS ,165% COFINS 7,60%","12,90%","1102","5102"],
+    ["ESN367PC","ESI0PC63","ESI0PC","Simples nacional","3,67%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,67% IPI 0% PIS ,165% COFINS 7,60%","12,92%","1102","5102"],
+    ["ESN368PC","ESI0PC64","ESI0PC","Simples nacional","3,68%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,68% IPI 0% PIS ,165% COFINS 7,60%","12,93%","1102","5102"],
+    ["ESN369PC","ESI0PC65","ESI0PC","Simples nacional","3,69%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,69% IPI 0% PIS ,165% COFINS 7,60%","12,94%","1102","5102"],
+    ["ESN371PC","ESI0PC66","ESI0PC","Simples nacional","3,71%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,71% IPI 0% PIS ,165% COFINS 7,60%","12,96%","1102","5102"],
+    ["ESN375PC","ESI0PC67","ESI0PC","Simples nacional","3,75%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,75% IPI 0% PIS ,165% COFINS 7,60%","13,00%","1102","5102"],
+    ["ESN376PC","ESI0PC68","ESI0PC","Simples nacional","3,76%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,76% IPI 0% PIS ,165% COFINS 7,60%","13,01%","1102","5102"],
+    ["ESN380PC","ESI0PC69","ESI0PC","Simples nacional","3,80%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,80% IPI 0% PIS ,165% COFINS 7,60%","13,05%","1102","5102"],
+    ["ESN381PC","ESI0PC70","ESI0PC","Simples nacional","3,81%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,81% IPI 0% PIS ,165% COFINS 7,60%","13,06%","1102","5102"],
+    ["ESN383PC","ESI0PC71","ESI0PC","Simples nacional","3,83%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,83% IPI 0% PIS ,165% COFINS 7,60%","13,08%","1102","5102"],
+    ["ESN384AT","EAI0PC18","EAI0PC","Ativo","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","13,09%","1551","5551"],
+    ["ESN384PC","ESI0PC72","ESI0PC","Simples nacional","3,84%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,84% IPI 0% PIS ,165% COFINS 7,60%","13,09%","1102","5102"],
+    ["ESN388PC","ESI0PC73","ESI0PC","Simples nacional","3,88%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,88% IPI 0% PIS ,165% COFINS 7,60%","13,13%","1102","5102"],
+    ["ESN393PC","ESI0PC74","ESI0PC","Simples nacional","3,93%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 3,93% IPI 0% PIS ,165% COFINS 7,60%","13,18%","1102","5102"],
+    ["ESN394AT","EAI0PC19","EAI0PC","Ativo","3,94%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,94% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","13,19%","1551","5551"],
+    ["ESN399AT","EAI0PC20","EAI0PC","Ativo","3,99%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 3,99% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO - MÁQUINAS E EQUIPAMENTOS","13,24%","1551","5551"],
+    ["ESN400AT","EAI0PC21","EAI0PC","Ativo","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS ,165% COFINS 7,60%- IMOBILIZADO: MÁQUINAS/EQUIPAMENTOS/PEÇAS","13,25%","1551","5551"],
+    ["ESN400PC","ESI0PC75","ESI0PC","Simples nacional","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,00% IPI 0% PIS ,165% COFINS 7,60%","13,25%","1102","5102"],
+    ["ESN404PC","ESI0PC76","ESI0PC","Simples nacional","4,04%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 4,04% IPI 0% PIS ,165% COFINS 7,60%","13,29%","1102","5102"],
+    ["ESN890PC","ESI0PC77","ESI0PC","Simples nacional","8,90%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 8,90% IPI 0% PIS ,165% COFINS 7,60%","18,15%","1102","5102"],
+    ["ESN900PC","ESI0PC78","ESI0PC","Simples nacional","9%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","SIMPLES ICMS 9,00% IPI 0% PIS 1,65% COFINS 7,60%","18,25%","1102","5102"],
+    ["FIX012","SOI0PC01","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF - fixo","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%","21,25%","2101","6101"],
+    ["IC-00001","CI000001","CI000","Complemento","4%","-","-","-","-","ICMS","Complemento de ICMS","5,00%","1101","5101"],
+    ["IC-00002","CI000002","CI000","Complemento","7%","-","-","-","-","ICMS","Complemento ICMS 7%","8,00%","1000","5000"],
+    ["IC-00003","CI000003","CI000","Complemento","3%","-","-","-","-","ICMS","Complemento de ICMS","4,00%","2556","6102"],
+    ["IC-00004","CI000004","CI000","Complemento","17%","-","-","-","-","ICMS","Complemento ICMS 17%","18,00%","1000","5000"],
+    ["IC-00325","C0I00001","C0I00","Complemento","-","3,25%","-","-","-","IPI","Complemento de IPI","4,25%","2101","6101"],
+    ["IC000012","CI000005","CI000","Complemento","12%","-","-","-","-","ICMS","Complemento de ICMS","13,00%","2101","6101"],
+    ["IC100012","CI000006","CI000","Complemento","12%","-","-","-","-","-","Complemento de ICMS BC 100%","12,00%","2101","6101"],
+    ["IMP 00","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 0% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%","28,75%","3101","7101"],
+    ["IMP 01","EI00PC01","EI00PC","Importação","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 10,65%","12,75%","3101","7101"],
+    ["IMP 12,6","EII0PC01","EII0PC","Importação","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12,60% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%","41,35%","1000","5000"],
+    ["IMP II 2","EI0IPC01","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 2% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%","23,75%","3101","7101"],
+    ["IMP II12","EI0IPC02","EI0IPC","Importação","-","10%","2,10%","9,65%","-","II-IC-IP-PI-CF","II 12% ICMS 0% IPI 10% PIS 2,10% COFINS 9,65%","33,75%","3101","7101"],
+    ["IMP II96","EI0IPC03","EI0IPC","Importação","-","6,50%","2,10%","9,65%","-","II-IC-IP-PI-CF2","II 96% ICMS 0% IPI 65% PIS 2,10% COFINS 9,65%","114,25%","3101","7101"],
+    ["S00000VL","SPCIS001","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS","8,65%","1933","5933"],
+    ["S00001VL","SPCIS002","SPCIS","Emissão NFS VL","-","-","0,65%","3%","5%","IS-PI-CF","5% ISS 0,65% PIS 3% COFINS","8,65%","1933","5933"],
+    ["S00I0051","S0000001","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ICMS Diferido","1,00%","1501","5501"],
+    ["S00I00IM","S00PC001","S00PC","Saída","-","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 0% IPI 0% PIS 2,10% COFINS 9,65%","12,75%","3000","7000"],
+    ["S00I00NN","S0000002","S0000","Saída","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["S00I00PC","S00PC002","S00PC","Saída","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%","10,25%","1101","5101"],
+    ["S00I00VE","S00PC003","S00PC","Saída","-","-","0,65%","3%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0,65% COFINS 3,00%","3,65%","1101","5101"],
+    ["S04I00NN","SI000001","SI000","Saída","4%","-","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 0% PIS 0% COFINS 0%","5,00%","2101","6101"],
+    ["S04I00PC","SI0PC001","SI0PC","Saída","4%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 4% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","14,25%","2101","6101"],
+    ["S04I10NN","SII00001","SII00","Saída","4%","10%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 10% PIS 0% COFINS 0%","15,00%","2101","6101"],
+    ["S04I65NN","SII00002","SII00","Saída","4%","6,50%","-","-","-","IC-IP-PI-CF","ICMS 4% IPI 6,5% PIS 0% COFINS 0%","11,50%","2101","6101"],
+    ["S07I00NN","SI000002","SI000","Saída","7%","-","-","-","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 0% COFINS 0%","8,00%","2101","6101"],
+    ["S07I00PC","SI0PC002","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","17,25%","2101","6101"],
+    ["S07I325","SIIPC001","SIIPC","Saída","7%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS","20,50%","2101","6101"],
+    ["S07I325N","SII00003","SII00","Saída","7%","3,25%","-","-","-","IC-IP-PISEX-COEX2","ICMS 07% IPI 3,25% PIS 0% COFINS 0% Exclusão ICMS base Pis/Cofins - IPI na BC ICMS","11,25%","2101","6101"],
+    ["S12I00MG","SI0PC003","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","2101","6101"],
+    ["S12I00NN","SI000003","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%","13,00%","2101","6101"],
+    ["S12I00PC","SI0PC004","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","2101","6101"],
+    ["S12I00RR","SI000004","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFINS 0%","13,00%","2101","6101"],
+    ["S12I00TR","SI000005","SI000","Saída","12%","-","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 0% COFI 0% TRANSF MS P/ MG","13,00%","2152","6152"],
+    ["S12I05PC","SIIPC002","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","27,25%","2101","6101"],
+    ["S12I0PC","SI0PC005","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","22,25%","2101","6101"],
+    ["S12I10NN","SII00004","SII00","Saída","12%","10%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 10% PIS 0% COFINS 0%","23,00%","2101","6101"],
+    ["S12I325","SIIPC003","SIIPC","Saída","12%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","25,50%","2101","6101"],
+    ["S12I375","SIIPC004","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","26,00%","2101","6101"],
+    ["S12I375N","SII00005","SII00","Saída","12%","3,75%","-","-","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 0% COFINS 0%","16,75%","2101","6101"],
+    ["S12I375P","SIIPC005","SIIPC","Saída","12%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","26,00%","2101","6101"],
+    ["S12I5PC","SIIPC006","SIIPC","Saída","12%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","27,25%","2101","6101"],
+    ["S12IPCPA","SI0PC006","SI0PC","Saída","12%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","2101","6101"],
+    ["S17I00B1","SI000006","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1101","5101"],
+    ["S17I00IM","SI0PC007","SI0PC","Saída","17%","-","2,10%","9,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 9,65%","29,75%","1101","5101"],
+    ["S17I00MM","SI0PC008","SI0PC","Saída","17%","-","2,10%","10,65%","-","II-IC-IP-PI-CF","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 10,65%","30,75%","1101","5101"],
+    ["S17I00NN","SI000007","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1101","5101"],
+    ["S17I00PC","SI0PC009","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","27,25%","1101","5101"],
+    ["S17I00R2","SI000008","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1101","5101"],
+    ["S17I00RB","SI000009","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1101","5101"],
+    ["S17I05PC","SIIPC007","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","32,25%","1101","5101"],
+    ["S17I0PC","SI0PC010","SI0PC","Saída","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","27,25%","1101","5101"],
+    ["S17I325M","SIIPC008","SIIPC","Saída","17%","3,25%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS BC PIS/COFINS","30,50%","1101","5101"],
+    ["S17I375","SIIPC009","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","31,00%","1101","5101"],
+    ["S17I375P","SIIPC010","SIIPC","Saída","17%","3,75%","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 17% IPI 3,75% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","31,00%","1101","5101"],
+    ["S17I5PC","SIIPC011","SIIPC","Saída","17%","5%","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 5% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","32,25%","1101","5101"],
+    ["S17IBC70","SI000010","SI000","Saída","17%","-","-","-","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1101","5101"],
+    ["S18I00PC","SI0PC011","SI0PC","Saída","18%","-","1,65%","7,60%","-","IC-IP-PISEX-COEX","ICMS 18% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","28,25%","1101","5101"],
+    ["S7I0PC","SI0PC012","SI0PC","Saída","7%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","17,25%","1101","5101"],
+    ["SERV-IMO","EA000002","EA0000","Ativo","-","-","-","-","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 0% COFINS 0% ATIVO FIXO","0,00%","1000","5000"],
+    ["SINISTRO","SO00PC01","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60% - Sinistro","10,25%","1000","5000"],
+    ["TESTE","SO00PC02","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IP-IC-PI-CF S/ ICMS","ICMS 0% IPI 0% PIS ,165% COFINS 7,60%","10,25%","1000","5000"],
+    ["VEN ORFE","SOI0PC02","SOI0PC","Saída outros","12%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%","22,25%","1000","5000"],
+    ["VEND GV2","SO00PC03","SO00PC","Saída outros","-","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%","10,25%","1000","5000"],
+    ["VENDA GV","SOI0PC03","SOI0PC","Saída outros","17%","-","1,65%","7,60%","-","IC-IP-PI-CF","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%","27,25%","1000","5000"],
+    ["-","E0000005","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E0000006","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E0000007","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E0000008","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E0000009","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E0000011","E0000","Entrada","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","E00PC005","E00PC","Entrada","0%","0%","1,65%","7,60%","-","-","1125 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,60 % - BT","10,25%","1125","5125"],
+    ["-","E00PC006","E00PC","Entrada","0%","0%","1,65%","7,6%","0%","-","ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","10,25%","2352","6352"],
+    ["-","E00PC009","E00PC","Entrada","0%","0%","2,10%","9,65%","-","-","ICMS 0% IPI 0% PIS 2,10% COFINS 9,65%","12,75%","3000","7000"],
+    ["-","E00PC010","E00PC","Entrada","0%","0%","2,10%","9,65%","-","-","ICMS 0% IPI 0% PIS 2,10% COFINS 9,65%","12,75%","3000","7000"],
+    ["-","EI000008","EI000","Entrada","12%","0%","0%","0%","-","-","2101 - ICMS 12 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","12,00%","1000","5000"],
+    ["-","EI000009","EI000","Entrada","12%","0%","0%","0%","-","-","ICMS 12 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","12,00%","1000","5000"],
+    ["-","EI000010","EI000","Entrada","17%","0%","0%","0%","-","-","ICMS 17 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","17,00%","1000","5000"],
+    ["-","EI000011","EI000","Entrada","7%","0%","0%","0%","-","-","ICMS 7 % - BI - IPI 0 % - BI - PIS 0 % - BI - COFINS 0 % - BI","7,00%","1000","5000"],
+    ["-","EI0PC009","EI0PC","Entrada","17%","0%","2,10%","9,65%","-","-","ICMS 17% II 0% IPI 0% PIS 2,10% COFINS 9,65%","29,75%","3000","7000"],
+    ["-","EI0PC010","EI0PC","Entrada","17%","0%","1,65%","7,60%","-","-","ICMS 17% IPI 0% PIS 1,65% COFINS 7,60%","27,25%","1000","5000"],
+    ["-","EI0PC011","EI0PC","Entrada","12%","0%","1,65%","7,60%","-","-","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60%","22,25%","1000","5000"],
+    ["-","EI0PC012","EI0PC","Entrada","7%","0%","1,65%","7,60%","-","-","ICMS 7% IPI 0% PIS 1,65% COFINS 7,60%","17,25%","1000","5000"],
+    ["-","EI0PC013","EI0PC","Entrada","17%","0%","1,65%","7,6%","0%","-","ICMS 17 % - BT - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","27,25%","2101","6101"],
+    ["-","EII0PC02","EII0P","Entrada","17%","0%","2,10%","9,65%","-","-","II 12,60% ICMS 17% IPI 0% PIS 2,10% COFINS 9,65%","42,35%","1000","5000"],
+    ["-","EPCIS001","EPCIS","Entrada","-","-","1,65%","7,60%","0%","-","0%  ISS 1,65% PIS 7,60% COFINS","10,25%","1933","5933"],
+    ["-","EPCIS002","EPCIS","Entrada","-","-","0%","0%","0%","-","0%  ISS 0% PIS 0% COFINS","0,00%","1933","5933"],
+    ["-","EPFI0PC","EPFI0","Entrada","12%","0%","1,65%","7,60%","-","-","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% PAUTA FISCAL","22,25%","1000","5000"],
+    ["-","GUIA0001","GUIA0","Entrada","-","-","-","-","-","-","0% DE IMPOSTOS","0,00%","1000","guia"],
+    ["-","IC-00005","IC-00","Complemento","5%","-","-","-","-","-","Complemento de ICMS","5,00%","1101","5101"],
+    ["-","IC-00520","IC-00","Complemento","-","5,2%","-","-","-","-","Complemento de IPI","5,20%","2101","6949"],
+    ["-","IC-00650","IC-00","Complemento","-","6,5%","-","-","-","-","Complemento de IPI","6,50%","2101","6101"],
+    ["-","S0000003","S0000","Saída","0%","0%","0%","0%","-","-","7504 - ICMS 0% IPI 0% PIS 0% COFINS 0%","1,00%","3503","7504"],
+    ["-","S0000004","S0000","Saída","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1000","5000"],
+    ["-","S0000005","S0000","Saída","0%","0%","0%","0%","-","-","5505 - ICMS 0% IPI 0% PIS 0% COFINS 0% ICMS Diferido","1,00%","1505","5505"],
+    ["-","S0000006","S0000","Saída","0%","0%","0%","0%","-","-","5504 - ICMS 0% IPI 0% PIS 0% COFINS 0% ICMS Diferido","1,00%","1504","5504"],
+    ["-","S0000007","S0000","Saída","0%","0%","1,65%","7,60%","-","-","6251 - ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%","10,25%","2251","6251"],
+    ["-","S0000008","S0000","Saída","0%","0%","1,65%","7,60%","-","-","5125 - ICMS 0% IPI 0% PIS 1,65% COFINS 7,60%","10,25%","1125","5125"],
+    ["-","S0000009","S0000","Saída","0%","0%","0%","0%","-","-","5554 - ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1554","5554"],
+    ["-","S0000010","S0000","Saída","0%","0%","0%","0%","-","-","5551 - ICMS 0% IPI 0% PIS 0% COFINS 0%","0,00%","1551","5551"],
+    ["-","S0000011","S0000","Saída","0%","0%","0%","0%","-","-","ICMS 0% IPI 0% PIS 0% COFINS 0%","1,00%","1912","5912"],
+    ["-","S0IPC001","S0IPC","Saída","0%","3,25%","1,65%","7,60%","-","-","5922 - ICMS 0% IPI 3,25% PIS 1,65% COFINS 7,60%","13,50%","1922","5922"],
+    ["-","S0IPC002","S0IPC","Saída","0%","3,25%","1,65%","7,60%","-","-","6922 - ICMS 0% IPI 3,25% PIS 1,65% COFINS 7,60%","13,50%","2922","6922"],
+    ["-","SI000011","SI000","Saída","17%","0%","0%","0%","-","-","ICMS 17% IPI 0% PIS 0% COFINS 0%","18,00%","1901","5901"],
+    ["-","SI000012","SI000","Saída","12%","0%","0%","0%","-","-","ICMS 12% IPI 0% PIS 0% COFINS 0%","13,00%","2910","6910"],
+    ["-","SI000013","SI000","Saída","17%","0%","0%","0%","-","-","ICMS 17%  Reduzido 94,12% IPI 0% PIS 0% COFINS 0%","18,00%","1551","5551"],
+    ["-","SI000014","SI000","Saída","12%","0%","0%","0%","-","-","ICMS 12%  Reduzido 91,67% IPI 0% PIS 0% COFINS 0%","13,00%","2551","6551"],
+    ["-","SI000015","SI000","Saída","12%","0%","0%","0%","-","-","ICMS 12%  Reduzido 91,67% IPI 0% PIS 0% COFINS 0%","13,00%","2551","6551"],
+    ["-","SI0PC013","SI0PC","Saída","17%","0%","1,65%","7,60%","-","-","5101 - ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","27,25%","1201","5101"],
+    ["-","SI0PC014","SI0PC","Saída","17%","0%","1,65%","7,60%","-","-","5102 - ICMS 17% IPI 0% PIS 1,65% COFINS 7,60% Sem exclusão da base ICMS","27,25%","1202","5102"],
+    ["-","SI0PC015","SI0PC","Saída","12%","0%","1,65%","7,60%","-","-","6101 - ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","2201","6101"],
+    ["-","SI0PC016","SI0PC","Saída","12%","0%","1,65%","7,60%","-","-","6102 - ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","2202","6102"],
+    ["-","SI0PC017","SI0PC","Saída","12%","0%","1,65%","7,60%","-","-","ICMS 12% IPI 0% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","22,25%","1201","6101"],
+    ["-","SIIPC012","SIIPC","Saída","12%","3,25%","1,65%","7,60%","-","-","6101 - ICMS 12% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","25,50%","2201","6101"],
+    ["-","SIIPC013","SIIPC","Saída","12%","3,25%","1,65%","7,60%","-","-","6102 - ICMS 12% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","25,50%","2202","6102"],
+    ["-","SIIPC014","SIIPC","Saída","17%","3,25%","1,65%","7,60%","-","-","5101 - ICMS 17% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","30,50%","1201","5101"],
+    ["-","SIIPC015","SIIPC","Saída","17%","3,25%","1,65%","7,60%","-","-","5102 - ICMS 17% IPI 3,25% PIS 1,65% COFINS 7,60% Exclusão ICMS base Pis/Cofins","30,50%","1102","5102"],
+    ["-","SO00PC04","SO00P","Saída","0%","0%","1,65%","7,6%","0%","-","5101 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","10,25%","1201","5101"],
+    ["-","SO00PC05","SO00P","Saída","0%","0%","1,65%","7,6%","0%","-","5102 - ICMS 0 % - BI - IPI 0 % - BI - PIS 1,65 % - BT - COFINS 7,6 % - BT","10,25%","1202","5102"]
   ];
 
   let listaCidades = [];
@@ -876,7 +861,7 @@
     });
   }
 
-  /* DE-PARA DE IMPOSTOS: SLOTS DINÂMICOS (+ E -) */
+  /* DE-PARA DE IMPOSTOS: SLOTS DINÂMICOS */
   let deparaSlotCount = 1;
   function adicionarSlotDePara() {
     deparaSlotCount++;
@@ -890,7 +875,7 @@
           <button class="btn-remove-slot" onclick="removerSlotDePara(${id})">➖ Recolher (-)</button>
         </div>
         <div class="depara-input-row">
-          <input type="text" id="inputCodAntigo_${id}" class="input-cidade input-depara" placeholder="Digite código antigo ou descrição (ex: E00I00PC, VENDA, DIFAL)..." oninput="pesquisarImpostoSlot(${id})">
+          <input type="text" id="inputCodAntigo_${id}" class="input-cidade input-depara" placeholder="Buscar por Cód. Antigo, Novo, CFOP ou Nome..." oninput="pesquisarImpostoSlot(${id})">
           <button class="btn-key-clear" onclick="limparSlotDePara(${id})">Limpar</button>
         </div>
         <div class="depara-matches-container" id="deparaMatchesBox_${id}"></div>
@@ -898,12 +883,12 @@
           <div class="depara-main-row">
             <div class="depara-code-pair">
               <div>
-                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo</div>
+                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); margin-bottom:2px;">Código Antigo / Origem</div>
                 <span class="depara-badge-old" id="deparaValAntigo_${id}">--</span>
               </div>
               <span class="depara-arrow">➔</span>
               <div>
-                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Código Novo</div>
+                <div style="font-size:0.68rem; text-transform:uppercase; font-weight:700; color:var(--brand-green); margin-bottom:2px;">Código Novo SAP</div>
                 <div class="depara-badge-new" id="deparaValNovo_${id}" onclick="copiarNovoCodigoImposto(this, ${id})">
                   <span id="deparaNovoTxt_${id}">--</span>
                   <span style="font-size:0.7rem; opacity:0.8;">📋</span>
@@ -922,8 +907,11 @@
             <div class="depara-detail-item"><span class="depara-detail-lbl">PIS</span><span class="depara-detail-val" id="deparaPis_${id}">--</span></div>
             <div class="depara-detail-item"><span class="depara-detail-lbl">COFINS</span><span class="depara-detail-val" id="deparaCofins_${id}">--</span></div>
             <div class="depara-detail-item"><span class="depara-detail-lbl">ISS</span><span class="depara-detail-val" id="deparaIss_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">Taxa Total SAP</span><span class="depara-detail-val" id="deparaTaxa_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Entrada</span><span class="depara-detail-val" id="deparaCfopE_${id}">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Saída</span><span class="depara-detail-val" id="deparaCfopS_${id}">--</span></div>
             <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_${id}">--</span></div>
-            <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_${id}" style="font-size:0.75rem;">--</span></div>
+            <div class="depara-detail-item"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_${id}" style="font-size:0.75rem;">--</span></div>
           </div>
         </div>
       </div>
@@ -955,10 +943,17 @@
     const matches = dbImpostos.filter(item => {
       const cAntigo = normalizar(item[0]);
       const cNovo = normalizar(item[1]);
+      const cMacro = normalizar(item[2]);
+      const cOper = normalizar(item[3]);
       const cDesc = normalizar(item[10] || "");
+      const cCfopE = normalizar(item[12] || "");
+      const cCfopS = normalizar(item[13] || "");
       const cAntigoFuzzy = normalizarChaveBusca(item[0]);
+      const cNovoFuzzy = normalizarChaveBusca(item[1]);
+
       return cAntigo.includes(termo) || cNovo.includes(termo) || cDesc.includes(termo) ||
-             (termoFuzzy.length >= 3 && cAntigoFuzzy.includes(termoFuzzy));
+             cCfopE === termo || cCfopS === termo || cMacro.includes(termo) || cOper.includes(termo) ||
+             (termoFuzzy.length >= 3 && (cAntigoFuzzy.includes(termoFuzzy) || cNovoFuzzy.includes(termoFuzzy)));
     });
 
     if (matches.length === 0) {
@@ -972,21 +967,28 @@
       document.getElementById(`deparaPis_${id}`).textContent = "--";
       document.getElementById(`deparaCofins_${id}`).textContent = "--";
       document.getElementById(`deparaIss_${id}`).textContent = "--";
+      document.getElementById(`deparaTaxa_${id}`).textContent = "--";
+      document.getElementById(`deparaCfopE_${id}`).textContent = "--";
+      document.getElementById(`deparaCfopS_${id}`).textContent = "--";
       document.getElementById(`deparaMacro_${id}`).textContent = "--";
       document.getElementById(`deparaComb_${id}`).textContent = "--";
       return;
     }
 
-    const exact = matches.find(item => normalizar(item[0]) === termo || normalizarChaveBusca(item[0]) === termoFuzzy);
+    const exact = matches.find(item => 
+      normalizar(item[0]) === termo || normalizar(item[1]) === termo ||
+      normalizarChaveBusca(item[0]) === termoFuzzy || normalizarChaveBusca(item[1]) === termoFuzzy
+    );
     const selected = exact || matches[0];
     exibirImpostoSlot(selected, id);
 
     if (matches.length > 1 && boxMatches) {
       let html = '';
       matches.slice(0, 8).forEach(m => {
+        const codExib = (m[0] && m[0] !== '-') ? m[0] : 'Novo Direto';
         html += `
-          <div class="depara-match-row" onclick="selecionarImpostoPelaLinhaSlot('${m[0]}', ${id})">
-            <span style="font-family:Consolas, monospace; font-weight:bold; color:var(--destino);">${m[0]}</span>
+          <div class="depara-match-row" onclick="selecionarImpostoPelaLinhaSlot('${m[1]}', ${id})">
+            <span style="font-family:Consolas, monospace; font-weight:bold; color:var(--destino);">${codExib}</span>
             <span style="color:var(--text-muted); font-size:0.75rem;">➔</span>
             <span style="font-family:Consolas, monospace; font-weight:bold; color:var(--brand-green);">${m[1]}</span>
             <span style="font-size:0.72rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:400px; margin-left:6px;">${m[10] || ''}</span>
@@ -1001,7 +1003,8 @@
   }
 
   function exibirImpostoSlot(item, id) {
-    document.getElementById(`deparaValAntigo_${id}`).textContent = item[0] || "--";
+    const codAntigo = (item[0] && item[0] !== '-') ? item[0] : "Novo Direto (Sem código antigo)";
+    document.getElementById(`deparaValAntigo_${id}`).textContent = codAntigo;
     document.getElementById(`deparaNovoTxt_${id}`).textContent = item[1] || "--";
     document.getElementById(`deparaMacro_${id}`).textContent = item[2] || "--";
     document.getElementById(`deparaOperacao_${id}`).textContent = item[3] || "--";
@@ -1012,14 +1015,19 @@
     document.getElementById(`deparaIss_${id}`).textContent = item[8] || "--";
     document.getElementById(`deparaComb_${id}`).textContent = item[9] || "-";
     document.getElementById(`deparaDescricao_${id}`).textContent = item[10] || "Descrição não cadastrada";
+    document.getElementById(`deparaTaxa_${id}`).textContent = item[11] || "--";
+    document.getElementById(`deparaCfopE_${id}`).textContent = item[12] || "--";
+    document.getElementById(`deparaCfopS_${id}`).textContent = item[13] || "--";
   }
 
-  function selecionarImpostoPelaLinhaSlot(codAntigo, id) {
-    document.getElementById(`inputCodAntigo_${id}`).value = codAntigo;
-    const boxMatches = document.getElementById(`deparaMatchesBox_${id}`);
-    if (boxMatches) boxMatches.style.display = 'none';
-    const item = dbImpostos.find(x => x[0] === codAntigo);
-    if (item) exibirImpostoSlot(item, id);
+  function selecionarImpostoPelaLinhaSlot(codNovo, id) {
+    const item = dbImpostos.find(x => x[1] === codNovo);
+    if (item) {
+      document.getElementById(`inputCodAntigo_${id}`).value = item[1];
+      const boxMatches = document.getElementById(`deparaMatchesBox_${id}`);
+      if (boxMatches) boxMatches.style.display = 'none';
+      exibirImpostoSlot(item, id);
+    }
   }
 
   function copiarNovoCodigoImposto(el, id) {
@@ -1049,10 +1057,14 @@
     document.getElementById(`deparaPis_${id}`).textContent = "--";
     document.getElementById(`deparaCofins_${id}`).textContent = "--";
     document.getElementById(`deparaIss_${id}`).textContent = "--";
+    document.getElementById(`deparaTaxa_${id}`).textContent = "--";
+    document.getElementById(`deparaCfopE_${id}`).textContent = "--";
+    document.getElementById(`deparaCfopS_${id}`).textContent = "--";
     document.getElementById(`deparaMacro_${id}`).textContent = "--";
     document.getElementById(`deparaComb_${id}`).textContent = "--";
   }
 
+  /* MÓDULO CFOPS */
   let cfopSlotCount = 2;
   function adicionarCfopSlot() {
     cfopSlotCount++;
@@ -1095,6 +1107,7 @@
     descBox.innerHTML = `<strong>CFOP ${rawVal}:</strong>&nbsp;` + buscarDescricaoCFOP(rawVal);
   }
 
+  /* MÓDULO CHAVES DE ACESSO */
   let keySlotCount = 1;
   function adicionarKeySlot() {
     keySlotCount++;
@@ -1529,7 +1542,7 @@
       } catch (e) {}
     }
 
-    // 2. Se não há cache, ativa imediatamente a base offline interna de segurança
+    // 2. Se não há cache, ativa imediatamente a base offline interna
     if (listaCidades.length === 0) {
       listaCidades = baseOfflinePadrao.map(item => ({
         c: item.c,
@@ -1542,7 +1555,7 @@
       renderFavoritos();
     }
 
-    // 3. Tenta baixar a base completa de 5.570 municípios do IBGE em segundo plano
+    // 3. Baixa a base completa de 5.570 municípios do IBGE em segundo plano
     try {
       const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios");
       if (!res.ok) throw new Error("Erro HTTP");
@@ -1558,7 +1571,6 @@
       if (offlineBanner) offlineBanner.style.display = 'none';
       renderFavoritos();
     } catch (err) {
-      // Se não houver internet, mantém a base offline ativa sem travar o app
       if (offlineBanner) offlineBanner.style.display = 'flex';
       statusDot.className = 'status-dot ready';
       statusText.textContent = `⚡ Modo Offline (${listaCidades.length} cidades)`;
@@ -1688,7 +1700,7 @@
     return (cidadeSelecionadaOri && cidadeSelecionadaDes && cidadeSelecionadaOri.u === cidadeSelecionadaDes.u) ? "5" : "6";
   }
 
-  /* INICIALIZAÇÃO IMEDIATA E ROBUSTA */
+  /* INICIALIZAÇÃO IMEDIATA E TOTALMENTE DESACOPLADA */
   try {
     const salvo = localStorage.getItem('ibge_tema') || 'dark';
     aplicarTema(salvo);
