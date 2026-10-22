@@ -230,14 +230,14 @@
         <span id="themeIcon">☀️</span> <span id="themeLabel">Modo Claro</span>
       </button>
       <div class="status-badge">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Iniciando...</span>
+        <div class="status-dot ready" id="statusDot"></div>
+        <span id="statusText">⚡ Base pronta</span>
       </div>
     </div>
   </header>
 
   <div id="offlineBanner" class="offline-banner">
-    <span>⚠️ <strong>Modo Offline Ativo:</strong> Usando base interna de segurança. Para sincronizar a lista completa de municípios do IBGE conecte-se à internet e clique em Tentar Novamente.</span>
+    <span>⚠️ <strong>Modo Offline Ativo:</strong> Usando base interna de segurança. Para sincronizar os 5.570 municípios do IBGE conecte-se à internet e clique em Tentar Novamente.</span>
     <button onclick="carregarBaseIBGE(true)">Tentar Novamente</button>
   </div>
 
@@ -356,7 +356,7 @@
             <input type="text" id="manualCfopNfe" class="cfop-input-manual" placeholder="5102" value="5102" maxlength="5" oninput="atualizarDescricaoCFOP('nfe')">
             <button class="btn-copy-cfop-manual" id="btnCopyNfe" onclick="copiarCFOPManual('manualCfopNfe', this)">Copiar CFOP</button>
           </div>
-          <div class="cfop-desc-box" id="descCfopNfe">Carregando descrição...</div>
+          <div class="cfop-desc-box" id="descCfopNfe"><strong>CFOP 5102:</strong>&nbsp;Venda de mercadoria adquirida ou recebida de terceiros no mesmo Estado.</div>
           <div class="cfop-chips">
             <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '102')">Venda: <strong id="chipNfeVenda">5.102</strong></div>
             <div class="cfop-chip" onclick="aplicarPresetCFOP('nfe', '405')">ST: <strong id="chipNfeST">5.405</strong></div>
@@ -375,7 +375,7 @@
             <input type="text" id="manualCfopCte" class="cfop-input-manual" placeholder="5353" value="5353" maxlength="5" oninput="atualizarDescricaoCFOP('cte')">
             <button class="btn-copy-cfop-manual" id="btnCopyCte" onclick="copiarCFOPManual('manualCfopCte', this)">Copiar CFOP</button>
           </div>
-          <div class="cfop-desc-box" id="descCfopCte">Carregando descrição...</div>
+          <div class="cfop-desc-box" id="descCfopCte"><strong>CFOP 5353:</strong>&nbsp;Prestação de serviço de transporte a estabelecimento comercial no Estado.</div>
           <div class="cfop-chips">
             <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '353')">Comércio: <strong id="chipCteCom">5.353</strong></div>
             <div class="cfop-chip" onclick="aplicarPresetCFOP('cte', '352')">Indústria: <strong id="chipCteInd">5.352</strong></div>
@@ -503,7 +503,84 @@
 </div>
 
 <script>
-  /* Base Unificada de 257 Códigos de Imposto */
+  /* 1. CONSTANTES DE UFs E ALÍQUOTAS */
+  const ufsPrefix = {
+    "11":"RO","12":"AC","13":"AM","14":"RR","15":"PA","16":"AP","17":"TO",
+    "21":"MA","22":"PI","23":"CE","24":"RN","25":"PB","26":"PE","27":"AL",
+    "28":"SE","29":"BA","31":"MG","32":"ES","33":"RJ","35":"SP","41":"PR",
+    "42":"SC","43":"RS","50":"MS","51":"MT","52":"GO","53":"DF"
+  };
+
+  const sulSudesteSemES = ["SP", "RJ", "MG", "PR", "SC", "RS"];
+  const norteNordesteCO_ES = ["AC","AP","AM","PA","RO","RR","TO","AL","BA","CE","MA","PB","PE","PI","RN","SE","DF","GO","MT","MS","ES"];
+
+  /* 2. BASE OFFLINE INTERNA DE SEGURANÇA */
+  const baseOfflinePadrao = [
+    {c:"5003207", n:"Corumbá", u:"MS"},
+    {c:"5002704", n:"Campo Grande", u:"MS"},
+    {c:"5005400", n:"Ladário", u:"MS"},
+    {c:"5003702", n:"Dourados", u:"MS"},
+    {c:"5007901", n:"Sidrolândia", u:"MS"},
+    {c:"5008305", n:"Três Lagoas", u:"MS"},
+    {c:"4104808", n:"Cascavel", u:"PR"},
+    {c:"4106902", n:"Curitiba", u:"PR"},
+    {c:"4113700", n:"Londrina", u:"PR"},
+    {c:"4115200", n:"Maringá", u:"PR"},
+    {c:"4118501", n:"Pato Branco", u:"PR"},
+    {c:"3550308", n:"São Paulo", u:"SP"},
+    {c:"3548500", n:"Santos", u:"SP"},
+    {c:"3552205", n:"Sorocaba", u:"SP"},
+    {c:"3551702", n:"Sertãozinho", u:"SP"},
+    {c:"3509502", n:"Campinas", u:"SP"},
+    {c:"3106200", n:"Belo Horizonte", u:"MG"},
+    {c:"3130101", n:"Igarapé", u:"MG"},
+    {c:"3118601", n:"Contagem", u:"MG"},
+    {c:"3106705", n:"Betim", u:"MG"},
+    {c:"3170206", n:"Uberlândia", u:"MG"},
+    {c:"3304557", n:"Rio de Janeiro", u:"RJ"},
+    {c:"5103403", n:"Cuiabá", u:"MT"},
+    {c:"5107602", n:"Rondonópolis", u:"MT"},
+    {c:"5208707", n:"Goiânia", u:"GO"},
+    {c:"5300108", n:"Brasília", u:"DF"}
+  ];
+
+  /* 3. DICIONÁRIO OFICIAL DE CFOPS */
+  const dicionarioCFOP = {
+    "5101": "Venda de produção do estabelecimento no mesmo Estado.",
+    "6101": "Venda de produção do estabelecimento para outro Estado.",
+    "5102": "Venda de mercadoria adquirida ou recebida de terceiros no mesmo Estado.",
+    "6102": "Venda de mercadoria adquirida ou recebida de terceiros para outro Estado.",
+    "5103": "Venda de produção efetuada fora do estabelecimento no mesmo Estado.",
+    "6103": "Venda de produção efetuada fora do estabelecimento para outro Estado.",
+    "5104": "Venda de mercadoria de terceiros efetuada fora do estabelecimento no Estado.",
+    "6104": "Venda de mercadoria de terceiros fora do estabelecimento para outro Estado.",
+    "5401": "Venda de produção com mercadoria sujeita a Substituição Tributária (contribuinte substituto).",
+    "6401": "Venda interestadual de produção com mercadoria sujeita a Substituição Tributária.",
+    "5403": "Venda de mercadoria de terceiros com ST (contribuinte substituto).",
+    "6403": "Venda interestadual de mercadoria de terceiros com ST (contribuinte substituto).",
+    "5405": "Venda de mercadoria com ST na condição de contribuinte substituído (ICMS retido anteriormente).",
+    "6404": "Venda interestadual de mercadoria com ST na condição de contribuinte substituído.",
+    "5151": "Transferência de produção do estabelecimento para filial ou matriz no Estado.",
+    "6151": "Transferência de produção do estabelecimento para filial ou matriz em outro Estado.",
+    "5152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz no Estado.",
+    "6152": "Transferência de mercadoria adquirida de terceiros para filial ou matriz em outro Estado.",
+    "5201": "Devolução de compra para industrialização no mesmo Estado.",
+    "6201": "Devolução interestadual de compra para industrialização.",
+    "5202": "Devolução de compra para comercialização no mesmo Estado.",
+    "6202": "Devolução interestadual de compra para comercialização.",
+    "5949": "Outra saída de mercadoria ou prestação de serviço não especificada no Estado.",
+    "6949": "Outra saída de mercadoria ou prestação de serviço não especificada para outro Estado.",
+    "5352": "Prestação de serviço de transporte a estabelecimento industrial no Estado.",
+    "6352": "Prestação de serviço de transporte a estabelecimento industrial em outro Estado.",
+    "5353": "Prestação de serviço de transporte a estabelecimento comercial no Estado.",
+    "6353": "Prestação de serviço de transporte a estabelecimento comercial em outro Estado.",
+    "5354": "Prestação de serviço de transporte para redespacho no Estado.",
+    "6354": "Prestação interestadual de transporte para redespacho.",
+    "5357": "Prestação de serviço de transporte a não contribuinte ou não tomador no Estado.",
+    "6357": "Prestação interestadual de transporte a não contribuinte ou não tomador."
+  };
+
+  /* 4. BASE UNIFICADA DE 257 CÓDIGOS DE IMPOSTO (ANTIGOS + NOVOS SAP) */
   const dbImpostos = [
     ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%","30,00%","2551","6551"],
     ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%","25,00%","2556","6556"],
@@ -1051,7 +1128,7 @@
     document.getElementById(`deparaValAntigo_${id}`).textContent = "--";
     document.getElementById(`deparaNovoTxt_${id}`).textContent = "--";
     document.getElementById(`deparaOperacao_${id}`).textContent = "--";
-    document.getElementById(`deparaDescricao_${id}`).textContent = "Digite um código de imposto antigo acima para ver o novo formato e suas alíquotas.";
+    document.getElementById(`deparaDescricao_${id}`).textContent = "Digite um código antigo, código novo, CFOP ou palavra-chave acima.";
     document.getElementById(`deparaIcms_${id}`).textContent = "--";
     document.getElementById(`deparaIpi_${id}`).textContent = "--";
     document.getElementById(`deparaPis_${id}`).textContent = "--";
@@ -1081,7 +1158,7 @@
           <input type="text" id="manualCfop_${id}" class="cfop-input-manual" placeholder="5102" value="5102" maxlength="5" oninput="atualizarDescricaoCFOPGenerico(${id})">
           <button class="btn-copy-cfop-manual" onclick="copiarCFOPManual('manualCfop_${id}', this)">Copiar CFOP</button>
         </div>
-        <div class="cfop-desc-box" id="descCfop_${id}">Carregando descrição...</div>
+        <div class="cfop-desc-box" id="descCfop_${id}"><strong>CFOP 5102:</strong>&nbsp;Venda de mercadoria adquirida ou recebida de terceiros no mesmo Estado.</div>
       </div>
     `;
     container.appendChild(div.firstElementChild);
@@ -1700,16 +1777,15 @@
     return (cidadeSelecionadaOri && cidadeSelecionadaDes && cidadeSelecionadaOri.u === cidadeSelecionadaDes.u) ? "5" : "6";
   }
 
-  /* INICIALIZAÇÃO IMEDIATA E TOTALMENTE DESACOPLADA */
+  /* INICIALIZAÇÃO BLINDADA POR MÓDULO */
   try {
     const salvo = localStorage.getItem('ibge_tema') || 'dark';
     aplicarTema(salvo);
   } catch(e) { aplicarTema('dark'); }
 
-  carregarEstadosModulosSalvos();
-  atualizarDescricaoCFOP('nfe');
-  atualizarDescricaoCFOP('cte');
-  carregarBaseIBGE();
+  try { carregarEstadosModulosSalvos(); } catch(e) { console.error(e); }
+  try { atualizarDescricaoCFOP('nfe'); atualizarDescricaoCFOP('cte'); } catch(e) { console.error(e); }
+  try { carregarBaseIBGE(); } catch(e) { console.error(e); }
 </script>
 </body>
 </html>
