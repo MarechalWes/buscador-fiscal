@@ -200,7 +200,7 @@
     .depara-detail-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
     .depara-detail-val { font-size: 0.82rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; }
 
-    /* MÓDULO CALCULADORA DE RETENÇÕES & DEDUÇÃO REVERSA */
+    /* MÓDULO CALCULADORA DE RETENÇÕES */
     .calc-input-grid {
       display: grid;
       grid-template-columns: 330px 1fr;
@@ -277,7 +277,6 @@
       border-color: var(--destino);
     }
 
-    /* Valores com 2 casas e Fração de 4/5 casas */
     .ret-val-container {
       display: flex;
       flex-direction: column;
@@ -377,7 +376,7 @@
       border-radius: 10px;
       padding: 14px 18px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
       align-items: center;
     }
@@ -642,30 +641,40 @@
         🧮 Calculadora de Retenções & Dedução Reversa <span>(NFS-e / Serviços)</span>
       </div>
       <div class="module-actions">
-        <button class="pill" style="padding:5px 12px; font-weight:800; background:rgba(239,68,68,0.18); color:#fca5a5; border-color:rgba(239,68,68,0.4);" onclick="limparAmbosCamposCalculadora()">✕ Limpar Ambos</button>
+        <button class="pill" style="padding:5px 12px; font-weight:800; background:rgba(239,68,68,0.18); color:#fca5a5; border-color:rgba(239,68,68,0.4);" onclick="limparAmbosCamposCalculadora()">✕ Limpar Tudo</button>
         <button class="btn-toggle-module" id="btnToggleNfseCalc" onclick="alternarModulo('nfseCalcBody', 'btnToggleNfseCalc', 'nfse_calc_col')">➖ Recolher Módulo</button>
       </div>
     </div>
     <div id="nfseCalcBody" style="display:flex; flex-direction:column; gap:14px;">
       <div class="calc-input-grid">
-        <!-- Entradas: Bruto e Líquido Zerados ao Abrir -->
+        <!-- Entradas: Bruto, Desconto Condicional e Líquido -->
         <div class="calc-panel-left">
           <div style="display:flex; flex-direction:column; gap:4px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">1. Valor dos Serviços (Bruto)</span>
               <button class="pill" style="padding:1px 6px; font-size:0.65rem;" onclick="limparBruto()">✕ Limpar</button>
             </div>
-            <input type="text" id="calcValorBruto" class="input-money" placeholder="0,00" value="" oninput="aoDigitarBruto()">
+            <input type="text" id="calcValorBruto" class="input-money" placeholder="0,00" value="" oninput="aoDigitarValoresCalc()">
           </div>
+
           <div style="display:flex; flex-direction:column; gap:4px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--destino);">2. Valor Líquido da Fatura</span>
+              <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:#38bdf8;">2. Desconto Condicional / Abatimento</span>
+              <button class="pill" style="padding:1px 6px; font-size:0.65rem;" onclick="limparDesconto()">✕ Limpar</button>
+            </div>
+            <input type="text" id="calcValorDesconto" class="input-money" style="color:#38bdf8;" placeholder="0,00" value="" oninput="aoDigitarValoresCalc()">
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--destino);">3. Valor Líquido da Fatura</span>
               <button class="pill" style="padding:1px 6px; font-size:0.65rem;" onclick="limparLiquidoReverso()">✕ Limpar</button>
             </div>
-            <input type="text" id="calcValorLiquidoInput" class="input-money" style="color:var(--destino);" placeholder="0,00" value="" oninput="executarEngenhariaReversa()">
+            <input type="text" id="calcValorLiquidoInput" class="input-money" style="color:var(--destino);" placeholder="0,00" value="" oninput="aoDigitarValoresCalc()">
           </div>
+
           <div style="font-size:0.7rem; color:var(--text-muted); line-height:1.4;">
-            💡 <strong>Dedução Automática:</strong> Digite o Bruto e o Líquido. O sistema deduz as alíquotas retidas. Clique em qualquer valor para copiar sem o sinal negativo para o SAP.
+            💡 <strong>Dedução Automática:</strong> Digite o Bruto e o Líquido. O sistema deduz as retenções e detecta descontos condicionais ou bases reduzidas.
           </div>
         </div>
 
@@ -675,7 +684,10 @@
           <div class="deducao-diagnostico-box" id="boxDiagnosticoReverso" style="display:none;">
             <div class="deducao-diag-title">
               <span id="diagPerfilNome" style="color:#fff;">🎯 Dedução Identificada</span>
-              <button class="btn-copy-diag" onclick="copiarDeducaoIdentificada(this)">📋 Copiar Diagnóstico</button>
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <button class="btn-copy-diag" id="btnConverterDesconto" style="display:none; border-color:#38bdf8; color:#38bdf8;" onclick="converterDiferencaEmDesconto()">🏷️ Lançar como Desconto Condicional</button>
+                <button class="btn-copy-diag" onclick="copiarDeducaoIdentificada(this)">📋 Copiar Diagnóstico</button>
+              </div>
             </div>
             <div style="font-size:0.78rem; color:var(--text); line-height:1.4;" id="diagPerfilTexto"></div>
           </div>
@@ -799,13 +811,23 @@
           </div>
           <span class="calc-total-val" id="resumoBruto">R$ 0,00</span>
         </div>
+
+        <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorAvulso(this, 'resumoDesconto')" title="Clique para copiar o Desconto">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="calc-total-lbl" style="color:#38bdf8;">Desconto Cond.</span>
+            <span style="font-size:0.75rem; color:#38bdf8;">📋</span>
+          </div>
+          <span class="calc-total-val" style="color:#38bdf8;" id="resumoDesconto">R$ 0,00</span>
+        </div>
+
         <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorAvulso(this, 'resumoRetencoes')" title="Clique para copiar o Total de Retenções">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="calc-total-lbl" style="color:var(--destino);">Retenções Deduzidas</span>
+            <span class="calc-total-lbl" style="color:var(--destino);">Retenções Impostos</span>
             <span style="font-size:0.75rem; color:var(--destino);">📋</span>
           </div>
           <span class="calc-total-val deduzido" id="resumoRetencoes">R$ 0,00</span>
         </div>
+
         <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorLiquido()" title="Clique para copiar o Valor Líquido">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="calc-total-lbl" style="color:var(--brand-green);">Líquido a Pagar (Clique p/ Copiar)</span>
@@ -949,7 +971,7 @@
     "6357": "Prestação interestadual de transporte a não contribuinte ou não tomador."
   };
 
-  /* 4. BASE UNIFICADA DE 257 CÓDIGOS DE IMPOSTO DO SAP */
+  /* 4. BASE UNIFICADA DE 258 CÓDIGOS DE IMPOSTO DO SAP */
   const dbImpostos = [
     ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%","30,00%","2551","6551"],
     ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%","25,00%","2556","6556"],
@@ -1523,6 +1545,8 @@
     inss: 0.0
   };
 
+  let diferencaAtipicaDetectada = 0;
+
   function parseMoney(valStr) {
     if (!valStr) return 0;
     const clean = valStr.toString().replace(/\./g, '').replace(',', '.').replace(/[^0-9.-]/g, '');
@@ -1567,10 +1591,11 @@
     const titulo = document.getElementById('diagPerfilNome').innerText;
     const texto = document.getElementById('diagPerfilTexto').innerText;
     const bruto = document.getElementById('resumoBruto').innerText;
+    const desc = document.getElementById('resumoDesconto').innerText;
     const retencao = document.getElementById('resumoRetencoes').innerText;
     const liquido = document.getElementById('resumoLiquido').innerText;
 
-    const textoCompleto = `${titulo}\n${texto}\nValor Bruto: ${bruto} | Retenções: ${retencao} | Valor Líquido: ${liquido}`;
+    const textoCompleto = `${titulo}\n${texto}\nBruto: ${bruto} | Desconto Condicional: ${desc} | Retenções: ${retencao} | Líquido: ${liquido}`;
     navigator.clipboard.writeText(textoCompleto).then(() => {
       const orig = btn.innerText;
       btn.innerText = "✓ Copiado!";
@@ -1585,6 +1610,12 @@
     document.getElementById('calcValorBruto').focus();
   }
 
+  function limparDesconto() {
+    document.getElementById('calcValorDesconto').value = "";
+    aoDigitarValoresCalc();
+    document.getElementById('calcValorDesconto').focus();
+  }
+
   function limparLiquidoReverso() {
     document.getElementById('calcValorLiquidoInput').value = "";
     document.getElementById('boxDiagnosticoReverso').style.display = 'none';
@@ -1594,6 +1625,7 @@
 
   function limparAmbosCamposCalculadora() {
     document.getElementById('calcValorBruto').value = "";
+    document.getElementById('calcValorDesconto').value = "";
     document.getElementById('calcValorLiquidoInput').value = "";
     document.getElementById('boxDiagnosticoReverso').style.display = 'none';
     
@@ -1611,7 +1643,15 @@
     document.getElementById('calcValorBruto').focus();
   }
 
-  function aoDigitarBruto() {
+  function converterDiferencaEmDesconto() {
+    if (diferencaAtipicaDetectada > 0) {
+      document.getElementById('calcValorDesconto').value = fmtMoney(diferencaAtipicaDetectada);
+      aoDigitarValoresCalc();
+    }
+  }
+
+  function aoDigitarValoresCalc() {
+    const bruto = parseMoney(document.getElementById('calcValorBruto').value);
     const liquidoStr = document.getElementById('calcValorLiquidoInput').value.trim();
     if (liquidoStr) {
       executarEngenhariaReversa();
@@ -1637,28 +1677,46 @@
   /* MOTOR COMBINATÓRIO DE ENGENHARIA REVERSA */
   function executarEngenhariaReversa() {
     const bruto = parseMoney(document.getElementById('calcValorBruto').value);
+    const desconto = parseMoney(document.getElementById('calcValorDesconto').value);
     const liquido = parseMoney(document.getElementById('calcValorLiquidoInput').value);
     const boxDiag = document.getElementById('boxDiagnosticoReverso');
+    const btnConverter = document.getElementById('btnConverterDesconto');
 
     if (bruto <= 0 || liquido <= 0) {
       boxDiag.style.display = 'none';
+      btnConverter.style.display = 'none';
       recalcularModoDireto();
       return;
     }
 
-    const retencao = Math.max(0, bruto - liquido);
-    const pct = bruto > 0 ? (retencao / bruto) * 100 : 0;
+    const diffTotal = Math.max(0, bruto - liquido);
+    const diffImpostos = Math.max(0, diffTotal - desconto);
+    const pctImpostos = bruto > 0 ? (diffImpostos / bruto) * 100 : 0;
+    diferencaAtipicaDetectada = diffImpostos;
 
     boxDiag.style.display = 'flex';
 
-    if (retencao === 0) {
-      document.getElementById('diagPerfilNome').textContent = "🎯 Dedução Identificada: Sem Retenções (Líquido = Bruto)";
-      document.getElementById('diagPerfilTexto').textContent = "O valor líquido é igual ao bruto. A nota fiscal não sofreu retenções na fonte.";
+    if (diffTotal === 0) {
+      document.getElementById('diagPerfilNome').textContent = "🎯 Dedução Identificada: Sem Abatimentos (Líquido = Bruto)";
+      document.getElementById('diagPerfilTexto').textContent = "O valor líquido é igual ao bruto. A fatura não possui retenções nem descontos.";
+      btnConverter.style.display = 'none';
       atualizarPillsPorValor('issqn', 0);
       atualizarPillsPorValor('irrf', 0);
       atualizarPillsPorValor('pcc', 0);
       atualizarPillsPorValor('inss', 0);
-      atualizarInterfacePorValores(bruto, 0, 0, 0, 0);
+      atualizarInterfacePorValores(bruto, desconto, 0, 0, 0, 0);
+      return;
+    }
+
+    if (diffImpostos <= 0.02 && desconto > 0) {
+      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: Desconto Condicional / Abatimento de R$ ${fmtMoney(desconto)}`;
+      document.getElementById('diagPerfilTexto').textContent = `Diferença total de R$ ${fmtMoney(diffTotal)} 100% explicada pelo Desconto Condicional informado. Sem retenções na fonte de impostos.`;
+      btnConverter.style.display = 'none';
+      atualizarPillsPorValor('issqn', 0);
+      atualizarPillsPorValor('irrf', 0);
+      atualizarPillsPorValor('pcc', 0);
+      atualizarPillsPorValor('inss', 0);
+      atualizarInterfacePorValores(bruto, desconto, 0, 0, 0, 0);
       return;
     }
 
@@ -1686,12 +1744,12 @@
             const v_is = Math.round(bruto * iss * 100) / 100;
             const totalSimulado = v_ir + v_pc + v_in + v_is;
 
-            const diff = Math.abs(totalSimulado - retencao);
+            const diff = Math.abs(totalSimulado - diffImpostos);
             if (diff < menorDiff && diff <= 0.05) {
               menorDiff = diff;
               
               const partes = [];
-              if (ir > 0) partes.append ? null : partes.push(`IRRF ${(ir*100).toFixed(1).replace('.0', '')}%`);
+              if (ir > 0) partes.push(`IRRF ${(ir*100).toFixed(1).replace('.0', '')}%`);
               if (pc > 0) partes.push("PCC 4,65%");
               if (inss > 0) partes.push(`INSS ${(inss*100).toFixed(1).replace('.0', '')}%`);
               if (iss > 0) partes.push(`ISSQN ${(iss*100).toFixed(0)}%`);
@@ -1710,7 +1768,7 @@
 
               melhorMatch = {
                 titulo: `🎯 Dedução Identificada: ${titulo}`,
-                desc: `Diferença exata de <strong>R$ ${fmtMoney(retencao)} (${pct.toFixed(2).replace('.', ',')}%)</strong>.<br>${desc}`,
+                desc: `Diferença de impostos de <strong>R$ ${fmtMoney(diffImpostos)} (${pctImpostos.toFixed(2).replace('.', ',')}%)</strong>.<br>${desc}`,
                 irrf_rate: ir * 100,
                 pcc_rate: pc * 100,
                 inss_rate: inss * 100,
@@ -1726,6 +1784,7 @@
     if (melhorMatch) {
       document.getElementById('diagPerfilNome').textContent = melhorMatch.titulo;
       document.getElementById('diagPerfilTexto').innerHTML = melhorMatch.desc;
+      btnConverter.style.display = 'none';
 
       aliqRetencoes.issqn = melhorMatch.iss_rate;
       aliqRetencoes.irrf = melhorMatch.irrf_rate;
@@ -1737,17 +1796,27 @@
       atualizarPillsPorValor('pcc', melhorMatch.pcc_rate);
       atualizarPillsPorValor('inss', melhorMatch.inss_rate);
 
-      atualizarInterfacePorValores(bruto, melhorMatch.v_is, melhorMatch.v_ir, melhorMatch.v_pc, melhorMatch.v_in);
+      atualizarInterfacePorValores(bruto, desconto, melhorMatch.v_is, melhorMatch.v_ir, melhorMatch.v_pc, melhorMatch.v_in);
     } else {
-      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: Retenção Personalizada (${pct.toFixed(2).replace('.', ',')}%)`;
-      document.getElementById('diagPerfilTexto').innerHTML = `
-        Diferença calculada de <strong>R$ ${fmtMoney(retencao)}</strong>. Pode se tratar de alíquota municipal específica de ISSQN, dedução de materiais ou retenção parcial.
-      `;
-      atualizarInterfacePorValores(bruto, retencao, 0, 0, 0);
+      // Detecção de Base Reduzida ou Desconto Condicional
+      const baseEstimadaPcc = Math.round((diffImpostos / 0.0465) * 100) / 100;
+      let textoDica = `Diferença calculada de <strong>R$ ${fmtMoney(diffImpostos)}</strong> (${pctImpostos.toFixed(2).replace('.', ',')}% do total).<br>`;
+
+      if (Math.abs(Math.round(baseEstimadaPcc * 0.0465 * 100) / 100 - diffImpostos) <= 0.04 && baseEstimadaPcc < bruto) {
+        textoDica += `💡 <strong>Atenção Fiscal:</strong> Esse valor bate exatamente com retenção de <strong>PCC (4,65%) sobre Base Reduzida de R$ ${fmtMoney(baseEstimadaPcc)}</strong> (art. 8º da IN SRF 459/2004), ou pode ser um <strong>Desconto Condicional</strong> destacado na fatura.`;
+      } else {
+        textoDica += `Pode se tratar de Desconto Comercial / Condicional na fatura, dedução de materiais da base ou alíquota municipal específica.`;
+      }
+
+      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: Diferença Não Padrão (${pctImpostos.toFixed(2).replace('.', ',')}%)`;
+      document.getElementById('diagPerfilTexto').innerHTML = textoDica;
+      btnConverter.style.display = 'inline-block';
+
+      atualizarInterfacePorValores(bruto, desconto, diffImpostos, 0, 0, 0);
     }
   }
 
-  function atualizarInterfacePorValores(bruto, vIss, vIrrf, vPcc, vInss) {
+  function atualizarInterfacePorValores(bruto, desconto, vIss, vIrrf, vPcc, vInss) {
     document.getElementById('valRetIssqnMain').textContent = `R$ ${fmtMoney(vIss)}`;
     document.getElementById('valRetIrrfMain').textContent = `R$ ${fmtMoney(vIrrf)}`;
     document.getElementById('valRetPccMain').textContent = `R$ ${fmtMoney(vPcc)}`;
@@ -1781,11 +1850,12 @@
     document.getElementById('boxRetPcc').classList.toggle('active', vPcc > 0);
     document.getElementById('boxRetInss').classList.toggle('active', vInss > 0);
 
-    const totalRet = vIss + vIrrf + vPcc + vInss;
-    const liquido = Math.max(0, bruto - totalRet);
+    const totalRetImpostos = vIss + vIrrf + vPcc + vInss;
+    const liquido = Math.max(0, bruto - desconto - totalRetImpostos);
 
     document.getElementById('resumoBruto').textContent = `R$ ${fmtMoney(bruto)}`;
-    document.getElementById('resumoRetencoes').textContent = `R$ ${fmtMoney(totalRet)}`;
+    document.getElementById('resumoDesconto').textContent = `R$ ${fmtMoney(desconto)}`;
+    document.getElementById('resumoRetencoes').textContent = `R$ ${fmtMoney(totalRetImpostos)}`;
     document.getElementById('resumoLiquido').textContent = `R$ ${fmtMoney(liquido)}`;
   }
 
@@ -1811,6 +1881,7 @@
 
   function recalcularModoDireto() {
     const bruto = parseMoney(document.getElementById('calcValorBruto').value);
+    const desconto = parseMoney(document.getElementById('calcValorDesconto').value);
     const chkIss = document.getElementById('chkIssqnRetido').checked;
     const chkIrrf = document.getElementById('chkIrrfRetido').checked;
     const chkPcc = document.getElementById('chkPccRetido').checked;
@@ -1821,7 +1892,7 @@
     const vPcc = (chkPcc && aliqRetencoes.pcc > 0) ? Math.round(bruto * (aliqRetencoes.pcc / 100) * 100) / 100 : 0;
     const vInss = (chkInss && aliqRetencoes.inss > 0) ? Math.round(bruto * (aliqRetencoes.inss / 100) * 100) / 100 : 0;
 
-    atualizarInterfacePorValores(bruto, vIss, vIrrf, vPcc, vInss);
+    atualizarInterfacePorValores(bruto, desconto, vIss, vIrrf, vPcc, vInss);
   }
 
   function copiarValorLiquido() {
@@ -2328,7 +2399,6 @@
     const statusText = document.getElementById('statusText');
     const offlineBanner = document.getElementById('offlineBanner');
 
-    // 1. Tenta carregar do Cache LocalStorage
     if (!forcar) {
       try {
         const cache = localStorage.getItem('ibge_base_v3');
@@ -2345,7 +2415,6 @@
       } catch (e) {}
     }
 
-    // 2. Base offline interna de prontidão
     if (listaCidades.length === 0) {
       listaCidades = baseOfflinePadrao.map(item => ({
         c: item.c,
@@ -2358,7 +2427,6 @@
       renderFavoritos();
     }
 
-    // 3. Download completo do IBGE em segundo plano
     try {
       const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios");
       if (!res.ok) throw new Error("Erro HTTP");
