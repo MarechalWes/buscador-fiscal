@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Localizador Fiscal IBGE, CFOP & De-Para Impostos</title>
+  <title>Localizador Fiscal IBGE, CFOP, Impostos & NFS-e</title>
   <style>
     :root[data-theme="dark"] {
       --bg-main: #070d0a;
@@ -111,7 +111,7 @@
     .btn-toggle-module { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
     .btn-remove-slot { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 4px 10px; border-radius: 5px; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
 
-    .ibge-module-card, .cfop-module-card, .depara-card, .key-parser-card {
+    .ibge-module-card, .cfop-module-card, .depara-card, .nfse-calc-card, .key-parser-card {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px;
     }
 
@@ -126,8 +126,8 @@
     .btn-clear-card { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 5px; font-size: 0.72rem; cursor: pointer; }
 
     .search-row { display: flex; gap: 8px; margin-bottom: 4px; }
-    input[type="text"] { background: var(--bg-input); border: 1.5px solid var(--border); color: var(--text-title); padding: 10px 14px; border-radius: 8px; font-size: 0.92rem; outline: none; }
-    input[type="text"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--brand-green-glow); }
+    input[type="text"], input[type="number"] { background: var(--bg-input); border: 1.5px solid var(--border); color: var(--text-title); padding: 10px 14px; border-radius: 8px; font-size: 0.92rem; outline: none; }
+    input[type="text"]:focus, input[type="number"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--brand-green-glow); }
     .input-cidade { flex: 1; }
     .input-uf { width: 70px; text-align: center; text-transform: uppercase; font-weight: 700; }
     .search-hint { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
@@ -141,7 +141,7 @@
     .val-cidade { color: var(--text-title); font-weight: 600; }
     .val-uf { color: var(--tag-uf-text); font-weight: 700; background: var(--tag-uf-bg); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--tag-uf-border); font-size: 0.76rem; }
     .feedback-badge { display: none; font-size: 0.7rem; font-weight: 700; color: var(--brand-green-hover); background: rgba(0, 200, 83, 0.2); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-    .item-card.copied .feedback-badge, .route-box-clickable.copied .feedback-badge, .key-chip-result.copied .feedback-badge { display: block; }
+    .item-card.copied .feedback-badge, .route-box-clickable.copied .feedback-badge, .key-chip-result.copied .feedback-badge, .btn-calc-copy.copied .feedback-badge { display: block; }
 
     .route-panel { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
     .route-display { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -200,6 +200,123 @@
     .depara-detail-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
     .depara-detail-val { font-size: 0.82rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; }
 
+    /* Módulo Calculadora de Retenções NFS-e */
+    .calc-input-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .calc-input-grid { grid-template-columns: 1fr; } }
+
+    .calc-panel-left {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .input-money {
+      font-size: 1.25rem;
+      font-family: Consolas, monospace;
+      font-weight: 800;
+      color: var(--brand-green);
+      letter-spacing: 0.5px;
+    }
+
+    .retencao-card-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .ret-box {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .ret-box.active {
+      border-color: var(--destino);
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .ret-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ret-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-title);
+    }
+    .ret-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .ret-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .ret-pill.active {
+      background: var(--destino);
+      color: #000;
+      border-color: var(--destino);
+    }
+    .ret-val-deduzido {
+      font-size: 0.95rem;
+      font-family: Consolas, monospace;
+      font-weight: 800;
+      color: #fca5a5;
+    }
+
+    .calc-results-summary {
+      background: var(--bg-input);
+      border: 1.5px solid var(--brand-green);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      align-items: center;
+    }
+    .calc-total-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .calc-total-lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .calc-total-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      font-family: Consolas, monospace;
+      color: var(--text-title);
+    }
+    .calc-total-val.destaque {
+      color: var(--brand-green);
+    }
+    .calc-total-val.deduzido {
+      color: var(--danger);
+    }
+
     .key-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .input-key { flex: 1; min-width: 280px; font-family: Consolas, monospace; font-size: 0.95rem; }
     .btn-sefaz-consult { background: #008f39; border: 1px solid #008f39; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -220,8 +337,8 @@
 <div class="container">
   <header>
     <div class="header-titles">
-      <h1>Localizador Fiscal IBGE, CFOP & De-Para Impostos <span>&bull;</span></h1>
-      <p>Localizador de municípios, alíquotas, CFOPs, desmembrador de chaves e conversor de códigos de imposto</p>
+      <h1>Localizador Fiscal IBGE, CFOP, Impostos & NFS-e <span>&bull;</span></h1>
+      <p>Localizador de municípios, alíquotas, CFOPs, desmembrador 44/50 dígitos e calculadora de retenções NFS-e</p>
     </div>
     <div class="header-actions">
       <button class="btn-global-toggle" onclick="recolherTodosModulos()" title="Recolher todos os blocos">➖ Recolher Tudo</button>
@@ -387,7 +504,7 @@
     </div>
   </div>
 
-  <!-- 3. DE-PARA DE CÓDIGOS DE IMPOSTO (BUSCA UNIVERSAL BIDIRECIONAL) -->
+  <!-- 3. DE-PARA DE CÓDIGOS DE IMPOSTO -->
   <div class="depara-card">
     <div class="module-header">
       <div class="module-title">🔄 Localizador de Códigos de Imposto <span>(Antigo ⇄ Novo ⇄ SAP)</span></div>
@@ -448,10 +565,135 @@
     </div>
   </div>
 
-  <!-- 4. DESMEMBRADOR DE CHAVES DE ACESSO -->
+  <!-- 4. NOVO MÓDULO: CALCULADORA DE RETENÇÕES & VALOR LÍQUIDO NFS-E -->
+  <div class="nfse-calc-card">
+    <div class="module-header">
+      <div class="module-title">
+        🧮 Calculadora de Retenções & Valor Líquido <span>(NFS-e / Serviços)</span>
+      </div>
+      <div class="module-actions">
+        <button class="btn-toggle-module" id="btnToggleNfseCalc" onclick="alternarModulo('nfseCalcBody', 'btnToggleNfseCalc', 'nfse_calc_col')">➖ Recolher Módulo</button>
+      </div>
+    </div>
+    <div id="nfseCalcBody" style="display:flex; flex-direction:column; gap:14px;">
+      <div class="calc-input-grid">
+        <!-- Entrada do Valor Bruto -->
+        <div class="calc-panel-left">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">Valor dos Serviços (Bruto)</span>
+            <input type="text" id="calcValorBruto" class="input-money" placeholder="Ex: 1038,00" value="1038,00" oninput="calcularRetencoesServico()">
+          </div>
+          <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.4;">
+            💡 Digite o valor total da NFS-e. Clique nas alíquotas ao lado para ativar ou desativar as retenções desta nota.
+          </div>
+        </div>
+
+        <!-- Seleção de Alíquotas e Retenções -->
+        <div class="retencao-card-row">
+          <!-- ISSQN -->
+          <div class="ret-box active" id="boxRetIssqn">
+            <div class="ret-box-header">
+              <span class="ret-label">ISSQN (Municipal)</span>
+              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="chkIssqnRetido" checked onchange="calcularRetencoesServico()"> Retido
+              </label>
+            </div>
+            <div class="ret-pills">
+              <span class="ret-pill" onclick="setAliqRet('issqn', 2, this)">2%</span>
+              <span class="ret-pill" onclick="setAliqRet('issqn', 3, this)">3%</span>
+              <span class="ret-pill" onclick="setAliqRet('issqn', 4, this)">4%</span>
+              <span class="ret-pill active" onclick="setAliqRet('issqn', 5, this)">5%</span>
+            </div>
+            <div class="ret-val-deduzido" id="valRetIssqn">- R$ 51,90</div>
+          </div>
+
+          <!-- IRRF -->
+          <div class="ret-box" id="boxRetIrrf">
+            <div class="ret-box-header">
+              <span class="ret-label">IRRF (Federal)</span>
+              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="chkIrrfRetido" onchange="calcularRetencoesServico()"> Retido
+              </label>
+            </div>
+            <div class="ret-pills">
+              <span class="ret-pill active" onclick="setAliqRet('irrf', 0, this)">Isento/SN</span>
+              <span class="ret-pill" onclick="setAliqRet('irrf', 1.0, this)">1,0%</span>
+              <span class="ret-pill" onclick="setAliqRet('irrf', 1.5, this)">1,5%</span>
+            </div>
+            <div class="ret-val-deduzido" id="valRetIrrf">R$ 0,00</div>
+          </div>
+
+          <!-- CSRF / PCC (4,65%) -->
+          <div class="ret-box" id="boxRetPcc">
+            <div class="ret-box-header">
+              <span class="ret-label">PIS/COF/CSLL (4,65%)</span>
+              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="chkPccRetido" onchange="calcularRetencoesServico()"> Retido
+              </label>
+            </div>
+            <div class="ret-pills">
+              <span class="ret-pill active" onclick="setAliqRet('pcc', 0, this)">Isento/SN</span>
+              <span class="ret-pill" onclick="setAliqRet('pcc', 4.65, this)">4,65%</span>
+            </div>
+            <div class="ret-val-deduzido" id="valRetPcc">R$ 0,00</div>
+          </div>
+
+          <!-- INSS -->
+          <div class="ret-box" id="boxRetInss">
+            <div class="ret-box-header">
+              <span class="ret-label">INSS (Previdenciário)</span>
+              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="chkInssRetido" onchange="calcularRetencoesServico()"> Retido
+              </label>
+            </div>
+            <div class="ret-pills">
+              <span class="ret-pill active" onclick="setAliqRet('inss', 0, this)">Isento</span>
+              <span class="ret-pill" onclick="setAliqRet('inss', 3.5, this)">3,5%</span>
+              <span class="ret-pill" onclick="setAliqRet('inss', 11.0, this)">11%</span>
+            </div>
+            <div class="ret-val-deduzido" id="valRetInss">R$ 0,00</div>
+          </div>
+
+          <!-- IBS / CBS Informativo (DANFSe v2.0) -->
+          <div class="ret-box" id="boxIbsCbs">
+            <div class="ret-box-header">
+              <span class="ret-label">IBS / CBS (Reforma)</span>
+              <span style="font-size:0.65rem; color:var(--text-muted);">Informativo</span>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.3;">
+              IBS 0,10%: <strong id="valIbsInf" style="color:var(--text-title);">R$ 0,99</strong><br>
+              CBS 0,90%: <strong id="valCbsInf" style="color:var(--text-title);">R$ 8,87</strong>
+            </div>
+            <div style="font-size:0.8rem; font-weight:bold; color:var(--destino);" id="valTotalIbsCbs">Total: R$ 9,86</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumo Totalizador com Copiar 1 Clique -->
+      <div class="calc-results-summary">
+        <div class="calc-total-item">
+          <span class="calc-total-lbl">Valor Bruto do Serviço</span>
+          <span class="calc-total-val" id="resumoBruto">R$ 1.038,00</span>
+        </div>
+        <div class="calc-total-item">
+          <span class="calc-total-lbl">Total Retenções Deduzidas</span>
+          <span class="calc-total-val deduzido" id="resumoRetencoes">- R$ 51,90</span>
+        </div>
+        <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorLiquido()" title="Clique para copiar o Valor Líquido">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="calc-total-lbl" style="color:var(--brand-green);">VALOR LÍQUIDO A PAGAR (CLIQUE P/ COPIAR)</span>
+            <span style="font-size:0.75rem; color:var(--brand-green);">📋</span>
+          </div>
+          <span class="calc-total-val destaque" id="resumoLiquido">R$ 986,10</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. DESMEMBRADOR DE CHAVES DE ACESSO (44 E 50 DÍGITOS) -->
   <div class="key-parser-card">
     <div class="module-header">
-      <div class="module-title">🔑 Desmembrador de Chaves de Acesso <span>(NF-e / CT-e / MDF-e)</span></div>
+      <div class="module-title">🔑 Desmembrador de Chaves de Acesso <span>(NF-e / CT-e / MDF-e / NFS-e 50 dígitos)</span></div>
       <div class="module-actions">
         <button class="btn-add-slot" onclick="adicionarKeySlot()">➕ Adicionar Chave (+)</button>
         <button class="btn-toggle-module" id="btnToggleKey" onclick="alternarModulo('keyBody', 'btnToggleKey', 'key_col')">➖ Recolher Módulo</button>
@@ -465,8 +707,8 @@
             <button class="btn-remove-slot" style="background:var(--bg-input); color:var(--text-muted); border-color:var(--border);" onclick="limparChaveSlot(1)">✕ Limpar</button>
           </div>
           <div class="key-input-row">
-            <input type="text" id="inputChaveAcesso_1" class="input-cidade input-key" placeholder="Cole a chave de 44 dígitos aqui..." oninput="desmembrarChaveSlot(1)">
-            <button class="btn-sefaz-consult" onclick="abrirConsultaSefazSlot(1)">🔍 Consultar SEFAZ</button>
+            <input type="text" id="inputChaveAcesso_1" class="input-cidade input-key" placeholder="Cole a chave aqui (44 dígitos NF-e/CT-e ou 50 dígitos NFS-e Nacional)..." oninput="desmembrarChaveSlot(1)">
+            <button class="btn-sefaz-consult" id="btnConsultarPortal_1" onclick="abrirConsultaSefazSlot(1)">🔍 Consultar Portal</button>
             <button class="btn-key-clear" onclick="limparChaveSlot(1)">Limpar</button>
           </div>
           <div class="key-grid-results">
@@ -476,12 +718,12 @@
               <span class="feedback-badge">Copiado!</span>
             </div>
             <div class="key-chip-result" onclick="copiarTextoValor(this, 'valChaveLimpa_1')">
-              <div class="key-chip-label"><span>Chave Limpa (44 dígitos)</span><span>📋 copiar</span></div>
+              <div class="key-chip-label"><span>Chave Limpa</span><span>📋 copiar</span></div>
               <div class="key-chip-val highlight" id="valChaveLimpa_1">--</div>
               <span class="feedback-badge">Copiado!</span>
             </div>
             <div class="key-chip-result" onclick="copiarTextoValor(this, 'valCnpjEmitente_1')">
-              <div class="key-chip-label"><span>CNPJ Emitente</span><span>📋 copiar</span></div>
+              <div class="key-chip-label"><span>CNPJ / CPF Prestador/Emitente</span><span>📋 copiar</span></div>
               <div class="key-chip-val" id="valCnpjEmitente_1">--</div>
               <span class="feedback-badge">Copiado!</span>
             </div>
@@ -491,7 +733,7 @@
               <span class="feedback-badge">Copiado!</span>
             </div>
             <div class="key-chip-result" onclick="copiarTextoValor(this, 'valInfoAdicional_1')">
-              <div class="key-chip-label"><span>UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
+              <div class="key-chip-label"><span>Município / UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
               <div class="key-chip-val" id="valInfoAdicional_1">--</div>
               <span class="feedback-badge">Copiado!</span>
             </div>
@@ -580,7 +822,7 @@
     "6357": "Prestação interestadual de transporte a não contribuinte ou não tomador."
   };
 
-  /* 4. BASE UNIFICADA DE 257 CÓDIGOS DE IMPOSTO (ANTIGOS + NOVOS SAP) */
+  /* 4. BASE UNIFICADA DE 257 CÓDIGOS DE IMPOSTO DO SAP */
   const dbImpostos = [
     ["2551-001","DI000001","DI000","DIFAL","12%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 12% - IPI 0% PIS COFINS 0%","30,00%","2551","6551"],
     ["2556-001","DI000002","DI000","DIFAL","7%","-","-","-","-","IP-IC-ICDF-PI-CF","DIFAL - ICMS 17% - 7% - IPI 0% - PIS COFINS 0%","25,00%","2556","6556"],
@@ -880,37 +1122,41 @@
   }
 
   function recolherTodosModulos() {
-    ['ibgeBody', 'cfopBody', 'deparaBody', 'keyBody'].forEach(id => {
+    ['ibgeBody', 'cfopBody', 'deparaBody', 'nfseCalcBody', 'keyBody'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
     const b1 = document.getElementById('btnToggleIbge'); if (b1) b1.textContent = '➕ Expandir Módulo';
     const b2 = document.getElementById('btnToggleCfop'); if (b2) b2.textContent = '➕ Expandir Módulo';
     const b3 = document.getElementById('btnCollapseDePara'); if (b3) b3.textContent = '➕ Expandir Módulo';
-    const b4 = document.getElementById('btnToggleKey'); if (b4) b4.textContent = '➕ Expandir Módulo';
+    const b4 = document.getElementById('btnToggleNfseCalc'); if (b4) b4.textContent = '➕ Expandir Módulo';
+    const b5 = document.getElementById('btnToggleKey'); if (b5) b5.textContent = '➕ Expandir Módulo';
 
     try {
       localStorage.setItem('ibge_col', 'recolhido');
       localStorage.setItem('cfop_col', 'recolhido');
       localStorage.setItem('depara_col', 'recolhido');
+      localStorage.setItem('nfse_calc_col', 'recolhido');
       localStorage.setItem('key_col', 'recolhido');
     } catch(e){}
   }
 
   function expandirTodosModulos() {
-    ['ibgeBody', 'cfopBody', 'deparaBody', 'keyBody'].forEach(id => {
+    ['ibgeBody', 'cfopBody', 'deparaBody', 'nfseCalcBody', 'keyBody'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'flex';
     });
     const b1 = document.getElementById('btnToggleIbge'); if (b1) b1.textContent = '➖ Recolher Módulo';
     const b2 = document.getElementById('btnToggleCfop'); if (b2) b2.textContent = '➖ Recolher Módulo';
     const b3 = document.getElementById('btnCollapseDePara'); if (b3) b3.textContent = '➖ Recolher Módulo';
-    const b4 = document.getElementById('btnToggleKey'); if (b4) b4.textContent = '➖ Recolher Módulo';
+    const b4 = document.getElementById('btnToggleNfseCalc'); if (b4) b4.textContent = '➖ Recolher Módulo';
+    const b5 = document.getElementById('btnToggleKey'); if (b5) b5.textContent = '➖ Recolher Módulo';
 
     try {
       localStorage.setItem('ibge_col', 'aberto');
       localStorage.setItem('cfop_col', 'aberto');
       localStorage.setItem('depara_col', 'aberto');
+      localStorage.setItem('nfse_calc_col', 'aberto');
       localStorage.setItem('key_col', 'aberto');
     } catch(e){}
   }
@@ -920,6 +1166,7 @@
       { body: 'ibgeBody', btn: 'btnToggleIbge', key: 'ibge_col' },
       { body: 'cfopBody', btn: 'btnToggleCfop', key: 'cfop_col' },
       { body: 'deparaBody', btn: 'btnCollapseDePara', key: 'depara_col' },
+      { body: 'nfseCalcBody', btn: 'btnToggleNfseCalc', key: 'nfse_calc_col' },
       { body: 'keyBody', btn: 'btnToggleKey', key: 'key_col' }
     ];
     modulos.forEach(m => {
@@ -1141,7 +1388,82 @@
     document.getElementById(`deparaComb_${id}`).textContent = "--";
   }
 
-  /* MÓDULO CFOPS */
+  /* 5. CALCULADORA DE RETENÇÕES DE SERVIÇO (NFS-E) */
+  let aliqRetencoes = {
+    issqn: 5.0,
+    irrf: 0.0,
+    pcc: 0.0,
+    inss: 0.0
+  };
+
+  function setAliqRet(tipo, valor, el) {
+    aliqRetencoes[tipo] = valor;
+    const parent = el.parentElement;
+    parent.querySelectorAll('.ret-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+
+    const chk = document.getElementById(`chk${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Retido`);
+    if (chk) {
+      if (valor > 0) chk.checked = true;
+      else chk.checked = false;
+    }
+    calcularRetencoesServico();
+  }
+
+  function calcularRetencoesServico() {
+    const rawVal = document.getElementById('calcValorBruto').value.replace(/\./g, '').replace(',', '.');
+    const bruto = parseFloat(rawVal) || 0;
+
+    const chkIss = document.getElementById('chkIssqnRetido').checked;
+    const chkIrrf = document.getElementById('chkIrrfRetido').checked;
+    const chkPcc = document.getElementById('chkPccRetido').checked;
+    const chkInss = document.getElementById('chkInssRetido').checked;
+
+    const vIss = (chkIss && aliqRetencoes.issqn > 0) ? (bruto * (aliqRetencoes.issqn / 100)) : 0;
+    const vIrrf = (chkIrrf && aliqRetencoes.irrf > 0) ? (bruto * (aliqRetencoes.irrf / 100)) : 0;
+    const vPcc = (chkPcc && aliqRetencoes.pcc > 0) ? (bruto * (aliqRetencoes.pcc / 100)) : 0;
+    const vInss = (chkInss && aliqRetencoes.inss > 0) ? (bruto * (aliqRetencoes.inss / 100)) : 0;
+
+    const totalRetencoes = vIss + vIrrf + vPcc + vInss;
+    const liquido = Math.max(0, bruto - totalRetencoes);
+
+    // IBS / CBS Informativo da DANFSe v2.0 (calculado sobre a base líquida de deduções)
+    const baseIbsCbs = liquido;
+    const vIbs = baseIbsCbs * 0.0010; // 0,10%
+    const vCbs = baseIbsCbs * 0.0090; // 0,90%
+    const vTotalIbsCbs = vIbs + vCbs;
+
+    // Atualização de Valores na Tela
+    document.getElementById('valRetIssqn').textContent = vIss > 0 ? `- R$ ${vIss.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
+    document.getElementById('valRetIrrf').textContent = vIrrf > 0 ? `- R$ ${vIrrf.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
+    document.getElementById('valRetPcc').textContent = vPcc > 0 ? `- R$ ${vPcc.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
+    document.getElementById('valRetInss').textContent = vInss > 0 ? `- R$ ${vInss.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
+
+    document.getElementById('boxRetIssqn').classList.toggle('active', vIss > 0);
+    document.getElementById('boxRetIrrf').classList.toggle('active', vIrrf > 0);
+    document.getElementById('boxRetPcc').classList.toggle('active', vPcc > 0);
+    document.getElementById('boxRetInss').classList.toggle('active', vInss > 0);
+
+    document.getElementById('valIbsInf').textContent = `R$ ${vIbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    document.getElementById('valCbsInf').textContent = `R$ ${vCbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    document.getElementById('valTotalIbsCbs').textContent = `Total: R$ ${vTotalIbsCbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+    document.getElementById('resumoBruto').textContent = `R$ ${bruto.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    document.getElementById('resumoRetencoes').textContent = `- R$ ${totalRetencoes.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    document.getElementById('resumoLiquido').textContent = `R$ ${liquido.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  }
+
+  function copiarValorLiquido() {
+    const el = document.getElementById('resumoLiquido');
+    let texto = el.textContent.replace('R$', '').trim();
+    navigator.clipboard.writeText(texto).then(() => {
+      const orig = el.textContent;
+      el.textContent = "✓ Copiado!";
+      setTimeout(() => el.textContent = orig, 900);
+    });
+  }
+
+  /* 6. MÓDULO CFOPS */
   let cfopSlotCount = 2;
   function adicionarCfopSlot() {
     cfopSlotCount++;
@@ -1184,7 +1506,7 @@
     descBox.innerHTML = `<strong>CFOP ${rawVal}:</strong>&nbsp;` + buscarDescricaoCFOP(rawVal);
   }
 
-  /* MÓDULO CHAVES DE ACESSO */
+  /* 7. MÓDULO DESMEMBRADOR DE CHAVES (44 E 50 DÍGITOS) */
   let keySlotCount = 1;
   function adicionarKeySlot() {
     keySlotCount++;
@@ -1198,8 +1520,8 @@
           <button class="btn-remove-slot" onclick="removerKeySlot(${id})">➖ Recolher (-)</button>
         </div>
         <div class="key-input-row">
-          <input type="text" id="inputChaveAcesso_${id}" class="input-cidade input-key" placeholder="Cole a chave de 44 dígitos aqui..." oninput="desmembrarChaveSlot(${id})">
-          <button class="btn-sefaz-consult" onclick="abrirConsultaSefazSlot(${id})">🔍 Consultar SEFAZ</button>
+          <input type="text" id="inputChaveAcesso_${id}" class="input-cidade input-key" placeholder="Cole a chave aqui (44 dígitos NF-e/CT-e ou 50 dígitos NFS-e)..." oninput="desmembrarChaveSlot(${id})">
+          <button class="btn-sefaz-consult" id="btnConsultarPortal_${id}" onclick="abrirConsultaSefazSlot(${id})">🔍 Consultar Portal</button>
           <button class="btn-key-clear" onclick="limparChaveSlot(${id})">Limpar</button>
         </div>
         <div class="key-grid-results">
@@ -1209,12 +1531,12 @@
             <span class="feedback-badge">Copiado!</span>
           </div>
           <div class="key-chip-result" onclick="copiarTextoValor(this, 'valChaveLimpa_${id}')">
-            <div class="key-chip-label"><span>Chave Limpa (44 dígitos)</span><span>📋 copiar</span></div>
+            <div class="key-chip-label"><span>Chave Limpa</span><span>📋 copiar</span></div>
             <div class="key-chip-val highlight" id="valChaveLimpa_${id}">--</div>
             <span class="feedback-badge">Copiado!</span>
           </div>
           <div class="key-chip-result" onclick="copiarTextoValor(this, 'valCnpjEmitente_${id}')">
-            <div class="key-chip-label"><span>CNPJ Emitente</span><span>📋 copiar</span></div>
+            <div class="key-chip-label"><span>CNPJ / CPF Prestador/Emitente</span><span>📋 copiar</span></div>
             <div class="key-chip-val" id="valCnpjEmitente_${id}">--</div>
             <span class="feedback-badge">Copiado!</span>
           </div>
@@ -1224,7 +1546,7 @@
             <span class="feedback-badge">Copiado!</span>
           </div>
           <div class="key-chip-result" onclick="copiarTextoValor(this, 'valInfoAdicional_${id}')">
-            <div class="key-chip-label"><span>UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
+            <div class="key-chip-label"><span>Município / UF &bull; Emissão &bull; Modelo</span><span>📋 copiar</span></div>
             <div class="key-chip-val" id="valInfoAdicional_${id}">--</div>
             <span class="feedback-badge">Copiado!</span>
           </div>
@@ -1250,6 +1572,7 @@
     const elCnpj = document.getElementById(`valCnpjEmitente_${id}`);
     const elDocSerie = document.getElementById(`valDocSerie_${id}`);
     const elInfo = document.getElementById(`valInfoAdicional_${id}`);
+    const btnPortal = document.getElementById(`btnConsultarPortal_${id}`);
 
     if (!chave) {
       elDescComp.textContent = "--"; elLimpa.textContent = "--"; elCnpj.textContent = "--"; elDocSerie.textContent = "--"; elInfo.textContent = "--";
@@ -1258,7 +1581,38 @@
 
     elLimpa.textContent = chave;
 
-    if (chave.length >= 44) {
+    // CASO 1: NFS-E PADRÃO NACIONAL (50 DÍGITOS)
+    if (chave.length >= 50) {
+      chave = chave.substring(0, 50);
+      elLimpa.textContent = chave;
+
+      const cMun = chave.substring(0, 7);
+      const tpAmb = chave.substring(7, 8);
+      const tpInsc = chave.substring(8, 9);
+      const cnpjRaw = chave.substring(9, 23);
+      const nNfsRaw = chave.substring(23, 36);
+      const nDoc = parseInt(nNfsRaw, 10).toString();
+      const aamm = chave.substring(36, 40);
+
+      const cnpjFmt = cnpjRaw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+      elCnpj.textContent = cnpjFmt;
+
+      elDocSerie.textContent = `NFSE ${nDoc}`;
+      elDescComp.textContent = `NFSE ${nDoc} CHAVE ${chave}`;
+
+      const siglaUf = ufsPrefix[cMun.substring(0, 2)] || cMun.substring(0, 2);
+      const ano = "20" + aamm.substring(0, 2);
+      const mes = aamm.substring(2, 4);
+
+      // Localiza nome do município se disponível na base
+      const munObj = listaCidades.find(m => m.c === cMun);
+      const nomeMun = munObj ? munObj.n : `Mun ${cMun}`;
+
+      elInfo.textContent = `${nomeMun}/${siglaUf} • ${mes}/${ano} • NFS-e Nacional`;
+      if (btnPortal) btnPortal.textContent = "🔍 Portal NFS-e";
+    }
+    // CASO 2: NF-E / CT-E / MDF-E (44 DÍGITOS)
+    else if (chave.length >= 44) {
       chave = chave.substring(0, 44);
       elLimpa.textContent = chave;
       const cUF = chave.substring(0, 2);
@@ -1279,11 +1633,12 @@
       const ano = "20" + aamm.substring(0, 2);
       const mes = aamm.substring(2, 4);
       elInfo.textContent = `${siglaUf} • ${mes}/${ano} • Mod ${mod}`;
+      if (btnPortal) btnPortal.textContent = (mod === "57") ? "🔍 Portal CT-e" : "🔍 Portal NF-e";
     } else {
-      elDescComp.textContent = `Aguardando 44 dígitos (${chave.length}/44)`;
-      elCnpj.textContent = `Aguardando 44 dígitos (${chave.length}/44)`;
-      elDocSerie.textContent = "--";
-      elInfo.textContent = "--";
+      elDescComp.textContent = `Aguardando dígitos (${chave.length} de 44 ou 50)`;
+      elCnpj.textContent = `--`;
+      elDocSerie.textContent = `--`;
+      elInfo.textContent = `--`;
     }
   }
 
@@ -1296,9 +1651,14 @@
     const input = document.getElementById(`inputChaveAcesso_${id}`);
     let chave = input.value.trim().replace(/\D/g, '');
     if (!chave) { alert("Cole a chave antes de consultar."); input.focus(); return; }
-    if (chave.length >= 44) chave = chave.substring(0, 44);
 
     navigator.clipboard.writeText(chave).then(() => {
+      // 50 dígitos: Portal Nacional da NFS-e
+      if (chave.length >= 50) {
+        window.open("https://www.nfse.gov.br/consultapublica", '_blank');
+        return;
+      }
+      // 44 dígitos: NF-e ou CT-e
       const mod = chave.length >= 22 ? chave.substring(20, 22) : "55";
       const urlSefaz = (mod === "57")
         ? "https://www.cte.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=cktLvUUKqh0="
@@ -1777,7 +2137,7 @@
     return (cidadeSelecionadaOri && cidadeSelecionadaDes && cidadeSelecionadaOri.u === cidadeSelecionadaDes.u) ? "5" : "6";
   }
 
-  /* INICIALIZAÇÃO BLINDADA POR MÓDULO */
+  /* INICIALIZAÇÃO BLINDADA */
   try {
     const salvo = localStorage.getItem('ibge_tema') || 'dark';
     aplicarTema(salvo);
@@ -1785,6 +2145,7 @@
 
   try { carregarEstadosModulosSalvos(); } catch(e) { console.error(e); }
   try { atualizarDescricaoCFOP('nfe'); atualizarDescricaoCFOP('cte'); } catch(e) { console.error(e); }
+  try { calcularRetencoesServico(); } catch(e) { console.error(e); }
   try { carregarBaseIBGE(); } catch(e) { console.error(e); }
 </script>
 </body>
