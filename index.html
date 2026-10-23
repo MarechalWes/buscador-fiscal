@@ -126,8 +126,8 @@
     .btn-clear-card { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 3px 8px; border-radius: 5px; font-size: 0.72rem; cursor: pointer; }
 
     .search-row { display: flex; gap: 8px; margin-bottom: 4px; }
-    input[type="text"], input[type="number"] { background: var(--bg-input); border: 1.5px solid var(--border); color: var(--text-title); padding: 10px 14px; border-radius: 8px; font-size: 0.92rem; outline: none; }
-    input[type="text"]:focus, input[type="number"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--brand-green-glow); }
+    input[type="text"] { background: var(--bg-input); border: 1.5px solid var(--border); color: var(--text-title); padding: 10px 14px; border-radius: 8px; font-size: 0.92rem; outline: none; }
+    input[type="text"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--brand-green-glow); }
     .input-cidade { flex: 1; }
     .input-uf { width: 70px; text-align: center; text-transform: uppercase; font-weight: 700; }
     .search-hint { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
@@ -141,7 +141,7 @@
     .val-cidade { color: var(--text-title); font-weight: 600; }
     .val-uf { color: var(--tag-uf-text); font-weight: 700; background: var(--tag-uf-bg); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--tag-uf-border); font-size: 0.76rem; }
     .feedback-badge { display: none; font-size: 0.7rem; font-weight: 700; color: var(--brand-green-hover); background: rgba(0, 200, 83, 0.2); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-    .item-card.copied .feedback-badge, .route-box-clickable.copied .feedback-badge, .key-chip-result.copied .feedback-badge, .btn-calc-copy.copied .feedback-badge { display: block; }
+    .item-card.copied .feedback-badge, .route-box-clickable.copied .feedback-badge, .key-chip-result.copied .feedback-badge { display: block; }
 
     .route-panel { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
     .route-display { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -200,14 +200,14 @@
     .depara-detail-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
     .depara-detail-val { font-size: 0.82rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; }
 
-    /* Módulo Calculadora de Retenções NFS-e */
+    /* CALCULADORA DE RETENÇÕES */
     .calc-input-grid {
       display: grid;
-      grid-template-columns: 260px 1fr;
+      grid-template-columns: 330px 1fr;
       gap: 16px;
       align-items: start;
     }
-    @media (max-width: 900px) { .calc-input-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 950px) { .calc-input-grid { grid-template-columns: 1fr; } }
 
     .calc-panel-left {
       background: var(--bg-input);
@@ -219,7 +219,7 @@
       gap: 12px;
     }
     .input-money {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-family: Consolas, monospace;
       font-weight: 800;
       color: var(--brand-green);
@@ -251,7 +251,7 @@
       align-items: center;
     }
     .ret-label {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-title);
@@ -276,12 +276,100 @@
       color: #000;
       border-color: var(--destino);
     }
-    .ret-val-deduzido {
-      font-size: 0.95rem;
+
+    /* Valores com 2 casas e Fração de 4/5 casas */
+    .ret-val-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 5px;
+      transition: background 0.15s;
+    }
+    .ret-val-container:hover {
+      background: rgba(0, 200, 83, 0.12);
+    }
+    .ret-val-main {
+      font-size: 0.98rem;
       font-family: Consolas, monospace;
       font-weight: 800;
-      color: #fca5a5;
+      color: var(--brand-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+    .ret-val-frac {
+      font-size: 0.7rem;
+      font-family: Consolas, monospace;
+      color: var(--text-muted);
+    }
+
+    .pcc-fracionado-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .pcc-fracionado-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      font-family: Consolas, monospace;
+    }
+    .pcc-fracionado-row span:first-child {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .pcc-frac-val-click {
+      color: var(--text-title);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .pcc-frac-val-click:hover {
+      color: var(--brand-green);
+      background: rgba(0, 200, 83, 0.15);
+    }
+
+    .deducao-diagnostico-box {
+      background: rgba(0, 200, 83, 0.08);
+      border: 1.5px solid var(--brand-green);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+    .deducao-diag-title {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--brand-green-hover);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .btn-copy-diag {
+      background: var(--bg-card);
+      border: 1px solid var(--brand-green);
+      color: var(--brand-green);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-copy-diag:hover { background: var(--brand-green); color: #000; }
 
     .calc-results-summary {
       background: var(--bg-input);
@@ -293,29 +381,11 @@
       gap: 12px;
       align-items: center;
     }
-    .calc-total-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .calc-total-lbl {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .calc-total-val {
-      font-size: 1.35rem;
-      font-weight: 900;
-      font-family: Consolas, monospace;
-      color: var(--text-title);
-    }
-    .calc-total-val.destaque {
-      color: var(--brand-green);
-    }
-    .calc-total-val.deduzido {
-      color: var(--danger);
-    }
+    .calc-total-item { display: flex; flex-direction: column; gap: 2px; }
+    .calc-total-lbl { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+    .calc-total-val { font-size: 1.3rem; font-weight: 900; font-family: Consolas, monospace; color: var(--text-title); }
+    .calc-total-val.destaque { color: var(--brand-green); }
+    .calc-total-val.deduzido { color: var(--destino); }
 
     .key-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .input-key { flex: 1; min-width: 280px; font-family: Consolas, monospace; font-size: 0.95rem; }
@@ -338,7 +408,7 @@
   <header>
     <div class="header-titles">
       <h1>Localizador Fiscal IBGE, CFOP, Impostos & NFS-e <span>&bull;</span></h1>
-      <p>Localizador de municípios, alíquotas, CFOPs, desmembrador 44/50 dígitos e calculadora de retenções NFS-e</p>
+      <p>Localizador de municípios, alíquotas, CFOPs, desmembrador 44/50 dígitos e dedução reversa de retenções</p>
     </div>
     <div class="header-actions">
       <button class="btn-global-toggle" onclick="recolherTodosModulos()" title="Recolher todos os blocos">➖ Recolher Tudo</button>
@@ -557,7 +627,7 @@
               <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Entrada</span><span class="depara-detail-val" id="deparaCfopE_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Saída</span><span class="depara-detail-val" id="deparaCfopS_1">--</span></div>
               <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_1">--</span></div>
-              <div class="depara-detail-item"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_1" style="font-size:0.75rem;">--</span></div>
+              <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_1" style="font-size:0.75rem;">--</span></div>
             </div>
           </div>
         </div>
@@ -565,126 +635,182 @@
     </div>
   </div>
 
-  <!-- 4. NOVO MÓDULO: CALCULADORA DE RETENÇÕES & VALOR LÍQUIDO NFS-E -->
+  <!-- 4. CALCULADORA DE RETENÇÕES & DEDUÇÃO REVERSA NFS-E -->
   <div class="nfse-calc-card">
     <div class="module-header">
       <div class="module-title">
-        🧮 Calculadora de Retenções & Valor Líquido <span>(NFS-e / Serviços)</span>
+        🧮 Calculadora de Retenções & Dedução Reversa <span>(NFS-e / Serviços)</span>
       </div>
       <div class="module-actions">
+        <button class="pill" style="padding:5px 12px; font-weight:800; background:rgba(239,68,68,0.18); color:#fca5a5; border-color:rgba(239,68,68,0.4);" onclick="limparAmbosCamposCalculadora()">✕ Limpar Ambos</button>
         <button class="btn-toggle-module" id="btnToggleNfseCalc" onclick="alternarModulo('nfseCalcBody', 'btnToggleNfseCalc', 'nfse_calc_col')">➖ Recolher Módulo</button>
       </div>
     </div>
     <div id="nfseCalcBody" style="display:flex; flex-direction:column; gap:14px;">
       <div class="calc-input-grid">
-        <!-- Entrada do Valor Bruto -->
+        <!-- Entradas: Bruto e Líquido Zerados ao Abrir -->
         <div class="calc-panel-left">
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">Valor dos Serviços (Bruto)</span>
-            <input type="text" id="calcValorBruto" class="input-money" placeholder="Ex: 1038,00" value="1038,00" oninput="calcularRetencoesServico()">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--text-muted);">1. Valor dos Serviços (Bruto)</span>
+              <button class="pill" style="padding:1px 6px; font-size:0.65rem;" onclick="limparBruto()">✕ Limpar</button>
+            </div>
+            <input type="text" id="calcValorBruto" class="input-money" placeholder="0,00" value="" oninput="aoDigitarBruto()">
           </div>
-          <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.4;">
-            💡 Digite o valor total da NFS-e. Clique nas alíquotas ao lado para ativar ou desativar as retenções desta nota.
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.74rem; font-weight:800; text-transform:uppercase; color:var(--destino);">2. Valor Líquido da Fatura</span>
+              <button class="pill" style="padding:1px 6px; font-size:0.65rem;" onclick="limparLiquidoReverso()">✕ Limpar</button>
+            </div>
+            <input type="text" id="calcValorLiquidoInput" class="input-money" style="color:var(--destino);" placeholder="0,00" value="" oninput="executarEngenhariaReversa()">
+          </div>
+          <div style="font-size:0.7rem; color:var(--text-muted); line-height:1.4;">
+            💡 <strong>Dedução Automática:</strong> Digite o Bruto e o Líquido. O sistema deduz as alíquotas retidas. Clique em qualquer valor para copiar sem o sinal negativo para o SAP.
           </div>
         </div>
 
-        <!-- Seleção de Alíquotas e Retenções -->
-        <div class="retencao-card-row">
-          <!-- ISSQN -->
-          <div class="ret-box active" id="boxRetIssqn">
-            <div class="ret-box-header">
-              <span class="ret-label">ISSQN (Municipal)</span>
-              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                <input type="checkbox" id="chkIssqnRetido" checked onchange="calcularRetencoesServico()"> Retido
-              </label>
+        <!-- Coluna da Direita: Diagnóstico e Cards de Retenção com 2 e 5 casas -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Diagnóstico Automático Genérico -->
+          <div class="deducao-diagnostico-box" id="boxDiagnosticoReverso" style="display:none;">
+            <div class="deducao-diag-title">
+              <span id="diagPerfilNome" style="color:#fff;">🎯 Dedução Identificada</span>
+              <button class="btn-copy-diag" onclick="copiarDeducaoIdentificada(this)">📋 Copiar Diagnóstico</button>
             </div>
-            <div class="ret-pills">
-              <span class="ret-pill" onclick="setAliqRet('issqn', 2, this)">2%</span>
-              <span class="ret-pill" onclick="setAliqRet('issqn', 3, this)">3%</span>
-              <span class="ret-pill" onclick="setAliqRet('issqn', 4, this)">4%</span>
-              <span class="ret-pill active" onclick="setAliqRet('issqn', 5, this)">5%</span>
-            </div>
-            <div class="ret-val-deduzido" id="valRetIssqn">- R$ 51,90</div>
+            <div style="font-size:0.78rem; color:var(--text); line-height:1.4;" id="diagPerfilTexto"></div>
           </div>
 
-          <!-- IRRF -->
-          <div class="ret-box" id="boxRetIrrf">
-            <div class="ret-box-header">
-              <span class="ret-label">IRRF (Federal)</span>
-              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                <input type="checkbox" id="chkIrrfRetido" onchange="calcularRetencoesServico()"> Retido
-              </label>
+          <!-- Cards das Retenções -->
+          <div class="retencao-card-row">
+            <!-- ISSQN -->
+            <div class="ret-box" id="boxRetIssqn">
+              <div class="ret-box-header">
+                <span class="ret-label">ISSQN (Municipal)</span>
+                <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                  <input type="checkbox" id="chkIssqnRetido" onchange="aoMudarCheckboxManual()"> Retido
+                </label>
+              </div>
+              <div class="ret-pills">
+                <span class="ret-pill active" onclick="setAliqRet('issqn', 0, this)">Isento</span>
+                <span class="ret-pill" onclick="setAliqRet('issqn', 2, this)">2%</span>
+                <span class="ret-pill" onclick="setAliqRet('issqn', 3, this)">3%</span>
+                <span class="ret-pill" onclick="setAliqRet('issqn', 5, this)">5%</span>
+              </div>
+              <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetIssqnMain')" title="Clique para copiar valor positivo de 2 casas">
+                <div class="ret-val-main">
+                  <span id="valRetIssqnMain">R$ 0,00</span>
+                  <span style="font-size:0.7rem; opacity:0.7;">📋</span>
+                </div>
+                <div class="ret-val-frac" id="valRetIssqnFrac" onclick="event.stopPropagation(); copiarValorAvulso(this);" title="Clique para copiar a fração exata">exato: 0,00000 📋</div>
+              </div>
             </div>
-            <div class="ret-pills">
-              <span class="ret-pill active" onclick="setAliqRet('irrf', 0, this)">Isento/SN</span>
-              <span class="ret-pill" onclick="setAliqRet('irrf', 1.0, this)">1,0%</span>
-              <span class="ret-pill" onclick="setAliqRet('irrf', 1.5, this)">1,5%</span>
-            </div>
-            <div class="ret-val-deduzido" id="valRetIrrf">R$ 0,00</div>
-          </div>
 
-          <!-- CSRF / PCC (4,65%) -->
-          <div class="ret-box" id="boxRetPcc">
-            <div class="ret-box-header">
-              <span class="ret-label">PIS/COF/CSLL (4,65%)</span>
-              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                <input type="checkbox" id="chkPccRetido" onchange="calcularRetencoesServico()"> Retido
-              </label>
+            <!-- IRRF -->
+            <div class="ret-box" id="boxRetIrrf">
+              <div class="ret-box-header">
+                <span class="ret-label">IRRF (Federal)</span>
+                <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                  <input type="checkbox" id="chkIrrfRetido" onchange="aoMudarCheckboxManual()"> Retido
+                </label>
+              </div>
+              <div class="ret-pills">
+                <span class="ret-pill active" onclick="setAliqRet('irrf', 0, this)">Isento</span>
+                <span class="ret-pill" onclick="setAliqRet('irrf', 1.0, this)">1,0%</span>
+                <span class="ret-pill" onclick="setAliqRet('irrf', 1.5, this)">1,5%</span>
+              </div>
+              <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetIrrfMain')" title="Clique para copiar valor positivo de 2 casas">
+                <div class="ret-val-main">
+                  <span id="valRetIrrfMain">R$ 0,00</span>
+                  <span style="font-size:0.7rem; opacity:0.7;">📋</span>
+                </div>
+                <div class="ret-val-frac" id="valRetIrrfFrac" onclick="event.stopPropagation(); copiarValorAvulso(this);" title="Clique para copiar a fração exata">exato: 0,00000 📋</div>
+              </div>
             </div>
-            <div class="ret-pills">
-              <span class="ret-pill active" onclick="setAliqRet('pcc', 0, this)">Isento/SN</span>
-              <span class="ret-pill" onclick="setAliqRet('pcc', 4.65, this)">4,65%</span>
-            </div>
-            <div class="ret-val-deduzido" id="valRetPcc">R$ 0,00</div>
-          </div>
 
-          <!-- INSS -->
-          <div class="ret-box" id="boxRetInss">
-            <div class="ret-box-header">
-              <span class="ret-label">INSS (Previdenciário)</span>
-              <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                <input type="checkbox" id="chkInssRetido" onchange="calcularRetencoesServico()"> Retido
-              </label>
-            </div>
-            <div class="ret-pills">
-              <span class="ret-pill active" onclick="setAliqRet('inss', 0, this)">Isento</span>
-              <span class="ret-pill" onclick="setAliqRet('inss', 3.5, this)">3,5%</span>
-              <span class="ret-pill" onclick="setAliqRet('inss', 11.0, this)">11%</span>
-            </div>
-            <div class="ret-val-deduzido" id="valRetInss">R$ 0,00</div>
-          </div>
+            <!-- CSRF / PCC (4,65%) -->
+            <div class="ret-box" id="boxRetPcc">
+              <div class="ret-box-header">
+                <span class="ret-label">PIS/COF/CSLL (4,65%)</span>
+                <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                  <input type="checkbox" id="chkPccRetido" onchange="aoMudarCheckboxManual()"> Retido
+                </label>
+              </div>
+              <div class="ret-pills">
+                <span class="ret-pill active" onclick="setAliqRet('pcc', 0, this)">Isento</span>
+                <span class="ret-pill" onclick="setAliqRet('pcc', 4.65, this)">4,65%</span>
+              </div>
+              <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetPccMain')" title="Clique para copiar total de PCC (2 casas)">
+                <div class="ret-val-main">
+                  <span id="valRetPccMain">R$ 0,00</span>
+                  <span style="font-size:0.7rem; opacity:0.7;">📋</span>
+                </div>
+                <div class="ret-val-frac" id="valRetPccFrac" onclick="event.stopPropagation(); copiarValorAvulso(this);" title="Clique para copiar a fração exata de PCC">exato: 0,00000 📋</div>
+              </div>
 
-          <!-- IBS / CBS Informativo (DANFSe v2.0) -->
-          <div class="ret-box" id="boxIbsCbs">
-            <div class="ret-box-header">
-              <span class="ret-label">IBS / CBS (Reforma)</span>
-              <span style="font-size:0.65rem; color:var(--text-muted);">Informativo</span>
+              <!-- DETALHAMENTO FRACIONADO: PIS, COFINS E CSLL -->
+              <div class="pcc-fracionado-box">
+                <div class="pcc-fracionado-row">
+                  <span>PIS (0,65%):</span>
+                  <span class="pcc-frac-val-click" id="fracPisVal" onclick="copiarValorAvulso(this)" title="Clique para copiar PIS">R$ 0,00 📋</span>
+                </div>
+                <div class="pcc-fracionado-row">
+                  <span>COFINS (3%):</span>
+                  <span class="pcc-frac-val-click" id="fracCofinsVal" onclick="copiarValorAvulso(this)" title="Clique para copiar COFINS">R$ 0,00 📋</span>
+                </div>
+                <div class="pcc-fracionado-row">
+                  <span>CSLL (1%):</span>
+                  <span class="pcc-frac-val-click" id="fracCsllVal" onclick="copiarValorAvulso(this)" title="Clique para copiar CSLL">R$ 0,00 📋</span>
+                </div>
+              </div>
             </div>
-            <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.3;">
-              IBS 0,10%: <strong id="valIbsInf" style="color:var(--text-title);">R$ 0,99</strong><br>
-              CBS 0,90%: <strong id="valCbsInf" style="color:var(--text-title);">R$ 8,87</strong>
+
+            <!-- INSS -->
+            <div class="ret-box" id="boxRetInss">
+              <div class="ret-box-header">
+                <span class="ret-label">INSS (Previdenciário)</span>
+                <label style="font-size:0.7rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                  <input type="checkbox" id="chkInssRetido" onchange="aoMudarCheckboxManual()"> Retido
+                </label>
+              </div>
+              <div class="ret-pills">
+                <span class="ret-pill active" onclick="setAliqRet('inss', 0, this)">Isento</span>
+                <span class="ret-pill" onclick="setAliqRet('inss', 3.5, this)">3,5%</span>
+                <span class="ret-pill" onclick="setAliqRet('inss', 11.0, this)">11%</span>
+              </div>
+              <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetInssMain')" title="Clique para copiar INSS (2 casas)">
+                <div class="ret-val-main">
+                  <span id="valRetInssMain">R$ 0,00</span>
+                  <span style="font-size:0.7rem; opacity:0.7;">📋</span>
+                </div>
+                <div class="ret-val-frac" id="valRetInssFrac" onclick="event.stopPropagation(); copiarValorAvulso(this);" title="Clique para copiar a fração exata de INSS">exato: 0,00000 📋</div>
+              </div>
             </div>
-            <div style="font-size:0.8rem; font-weight:bold; color:var(--destino);" id="valTotalIbsCbs">Total: R$ 9,86</div>
           </div>
         </div>
       </div>
 
-      <!-- Resumo Totalizador com Copiar 1 Clique -->
+      <!-- Totalizadores com Cópia Rápida -->
       <div class="calc-results-summary">
-        <div class="calc-total-item">
-          <span class="calc-total-lbl">Valor Bruto do Serviço</span>
-          <span class="calc-total-val" id="resumoBruto">R$ 1.038,00</span>
+        <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorAvulso(this, 'resumoBruto')" title="Clique para copiar o Valor Bruto">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="calc-total-lbl">Valor Bruto</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">📋</span>
+          </div>
+          <span class="calc-total-val" id="resumoBruto">R$ 0,00</span>
         </div>
-        <div class="calc-total-item">
-          <span class="calc-total-lbl">Total Retenções Deduzidas</span>
-          <span class="calc-total-val deduzido" id="resumoRetencoes">- R$ 51,90</span>
+        <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorAvulso(this, 'resumoRetencoes')" title="Clique para copiar o Total de Retenções">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="calc-total-lbl" style="color:var(--destino);">Retenções Deduzidas</span>
+            <span style="font-size:0.75rem; color:var(--destino);">📋</span>
+          </div>
+          <span class="calc-total-val deduzido" id="resumoRetencoes">R$ 0,00</span>
         </div>
         <div class="calc-total-item" style="cursor:pointer;" onclick="copiarValorLiquido()" title="Clique para copiar o Valor Líquido">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="calc-total-lbl" style="color:var(--brand-green);">VALOR LÍQUIDO A PAGAR (CLIQUE P/ COPIAR)</span>
+            <span class="calc-total-lbl" style="color:var(--brand-green);">Líquido a Pagar (Clique p/ Copiar)</span>
             <span style="font-size:0.75rem; color:var(--brand-green);">📋</span>
           </div>
-          <span class="calc-total-val destaque" id="resumoLiquido">R$ 986,10</span>
+          <span class="calc-total-val destaque" id="resumoLiquido">R$ 0,00</span>
         </div>
       </div>
     </div>
@@ -1235,7 +1361,7 @@
             <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Entrada</span><span class="depara-detail-val" id="deparaCfopE_${id}">--</span></div>
             <div class="depara-detail-item"><span class="depara-detail-lbl">CFOP Saída</span><span class="depara-detail-val" id="deparaCfopS_${id}">--</span></div>
             <div class="depara-detail-item"><span class="depara-detail-lbl">Cód. Macro</span><span class="depara-detail-val" id="deparaMacro_${id}">--</span></div>
-            <div class="depara-detail-item"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_${id}" style="font-size:0.75rem;">--</span></div>
+            <div class="depara-detail-item" style="grid-column: span 2;"><span class="depara-detail-lbl">Combinação</span><span class="depara-detail-val" id="deparaComb_${id}" style="font-size:0.75rem;">--</span></div>
           </div>
         </div>
       </div>
@@ -1388,13 +1514,226 @@
     document.getElementById(`deparaComb_${id}`).textContent = "--";
   }
 
-  /* 5. CALCULADORA DE RETENÇÕES DE SERVIÇO (NFS-E) */
+  /* 5. CALCULADORA DE RETENÇÕES & ENGENHARIA REVERSA */
   let aliqRetencoes = {
-    issqn: 5.0,
+    issqn: 0.0,
     irrf: 0.0,
     pcc: 0.0,
     inss: 0.0
   };
+
+  const perfisFiscaisReversos = [
+    { nome: "Retenção Federal Padrão de 6,15% (IRRF 1,50% + PCC 4,65%)", desc: "Tributação Federal plena de serviços técnicos / profissionais (IRRF 1,50% + PIS 0,65% + COFINS 3,00% + CSLL 1,00%).", irrf: 0.015, pcc: 0.0465, iss: 0.0, inss: 0.0 },
+    { nome: "Federal Completo (6,15%) + ISSQN Retido (5,00%) = 11,15%", desc: "Retenção Federal integral somada à retenção municipal máxima de ISSQN (5%).", irrf: 0.015, pcc: 0.0465, iss: 0.05, inss: 0.0 },
+    { nome: "Federal Completo (6,15%) + ISSQN Retido (2,00%) = 8,15%", desc: "Retenção Federal integral somada ao ISSQN retido de 2% pelo tomador.", irrf: 0.015, pcc: 0.0465, iss: 0.02, inss: 0.0 },
+    { nome: "Federal Completo (6,15%) + ISSQN Retido (3,00%) = 9,15%", desc: "Retenção Federal integral somada ao ISSQN retido de 3% pelo tomador.", irrf: 0.015, pcc: 0.0465, iss: 0.03, inss: 0.0 },
+    { nome: "Apenas ISSQN Retido pelo Tomador (5,00%)", desc: "Retenção municipal de ISSQN a 5% (comum em fornecedores do Simples Nacional ou com dispensa federal).", irrf: 0.0, pcc: 0.0, iss: 0.05, inss: 0.0 },
+    { nome: "Apenas ISSQN Retido pelo Tomador (2,00%)", desc: "Retenção municipal de ISSQN na alíquota de 2% pelo tomador.", irrf: 0.0, pcc: 0.0, iss: 0.02, inss: 0.0 },
+    { nome: "Apenas ISSQN Retido pelo Tomador (3,00%)", desc: "Retenção municipal de ISSQN na alíquota de 3% pelo tomador.", irrf: 0.0, pcc: 0.0, iss: 0.03, inss: 0.0 },
+    { nome: "Apenas CSRF / PCC (4,65%)", desc: "Retenção de PIS (0,65%) + COFINS (3,00%) + CSLL (1,00%) sem retenção de IRRF.", irrf: 0.0, pcc: 0.0465, iss: 0.0, inss: 0.0 },
+    { nome: "Apenas IRRF Retido (1,50%)", desc: "Retenção na fonte exclusiva de Imposto de Renda de 1,5%.", irrf: 0.015, pcc: 0.0, iss: 0.0, inss: 0.0 },
+    { nome: "Apenas IRRF Retido (1,00%)", desc: "Retenção na fonte de IRRF de 1,0% (vigilância, limpeza, conservação).", irrf: 0.01, pcc: 0.0, iss: 0.0, inss: 0.0 },
+    { nome: "Apenas INSS Retido (11,00%)", desc: "Retenção previdenciária de 11% (cessão de mão de obra / empreitada).", irrf: 0.0, pcc: 0.0, iss: 0.0, inss: 0.11 },
+    { nome: "INSS (11%) + Retenção Federal Padrão (6,15%) = 17,15%", desc: "Retenção previdenciária de 11% somada à retenção federal completa.", irrf: 0.015, pcc: 0.0465, iss: 0.0, inss: 0.11 }
+  ];
+
+  function parseMoney(valStr) {
+    if (!valStr) return 0;
+    const clean = valStr.toString().replace(/\./g, '').replace(',', '.').replace(/[^0-9.-]/g, '');
+    return parseFloat(clean) || 0;
+  }
+
+  function fmtMoney(val) {
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtFrac(val) {
+    return val.toFixed(5).replace('.', ',');
+  }
+
+  function extrairNumeroLimpo(str) {
+    if (!str) return "0,00";
+    let clean = str.toString().replace(/R\$/g, '').replace(/[\+\-📋✓]/g, '').replace(/exato:/gi, '').replace(/Copiado!/gi, '').trim();
+    const match = clean.match(/[0-9]+(?:\.[0-9]{3})*(?:,[0-9]{1,5})?/);
+    if (match) return match[0];
+    return clean;
+  }
+
+  function copiarValorAvulso(el, idOrigem) {
+    let rawText = "";
+    if (idOrigem) {
+      const origEl = document.getElementById(idOrigem);
+      rawText = origEl ? (origEl.innerText || origEl.textContent) : "";
+    } else if (el) {
+      rawText = el.innerText || el.textContent;
+    }
+
+    const valorLimpo = extrairNumeroLimpo(rawText);
+    navigator.clipboard.writeText(valorLimpo).then(() => {
+      const target = el || document.getElementById(idOrigem);
+      const originalHtml = target.innerHTML;
+      target.innerHTML = `<span style="color:var(--brand-green); font-weight:800;">✓ Copiado (${valorLimpo})!</span>`;
+      setTimeout(() => { target.innerHTML = originalHtml; }, 900);
+    });
+  }
+
+  function copiarDeducaoIdentificada(btn) {
+    const titulo = document.getElementById('diagPerfilNome').innerText;
+    const texto = document.getElementById('diagPerfilTexto').innerText;
+    const bruto = document.getElementById('resumoBruto').innerText;
+    const retencao = document.getElementById('resumoRetencoes').innerText;
+    const liquido = document.getElementById('resumoLiquido').innerText;
+
+    const textoCompleto = `${titulo}\n${texto}\nValor Bruto: ${bruto} | Retenções: ${retencao} | Valor Líquido: ${liquido}`;
+    navigator.clipboard.writeText(textoCompleto).then(() => {
+      const orig = btn.innerText;
+      btn.innerText = "✓ Copiado!";
+      setTimeout(() => { btn.innerText = orig; }, 1000);
+    });
+  }
+
+  function limparBruto() {
+    document.getElementById('calcValorBruto').value = "";
+    document.getElementById('boxDiagnosticoReverso').style.display = 'none';
+    recalcularModoDireto();
+    document.getElementById('calcValorBruto').focus();
+  }
+
+  function limparLiquidoReverso() {
+    document.getElementById('calcValorLiquidoInput').value = "";
+    document.getElementById('boxDiagnosticoReverso').style.display = 'none';
+    recalcularModoDireto();
+    document.getElementById('calcValorLiquidoInput').focus();
+  }
+
+  function limparAmbosCamposCalculadora() {
+    document.getElementById('calcValorBruto').value = "";
+    document.getElementById('calcValorLiquidoInput').value = "";
+    document.getElementById('boxDiagnosticoReverso').style.display = 'none';
+    
+    // Zera alíquotas
+    aliqRetencoes.issqn = 0;
+    aliqRetencoes.irrf = 0;
+    aliqRetencoes.pcc = 0;
+    aliqRetencoes.inss = 0;
+
+    // Reseta pills
+    document.querySelectorAll('.ret-box').forEach(box => {
+      box.querySelectorAll('.ret-pill').forEach((p, idx) => {
+        p.classList.toggle('active', idx === 0);
+      });
+    });
+
+    recalcularModoDireto();
+    document.getElementById('calcValorBruto').focus();
+  }
+
+  function aoDigitarBruto() {
+    const liquidoStr = document.getElementById('calcValorLiquidoInput').value.trim();
+    if (liquidoStr) {
+      executarEngenhariaReversa();
+    } else {
+      recalcularModoDireto();
+    }
+  }
+
+  function executarEngenhariaReversa() {
+    const bruto = parseMoney(document.getElementById('calcValorBruto').value);
+    const liquido = parseMoney(document.getElementById('calcValorLiquidoInput').value);
+    const boxDiag = document.getElementById('boxDiagnosticoReverso');
+
+    if (bruto <= 0 || liquido <= 0) {
+      boxDiag.style.display = 'none';
+      recalcularModoDireto();
+      return;
+    }
+
+    const retencao = Math.max(0, bruto - liquido);
+    const pct = bruto > 0 ? (retencao / bruto) * 100 : 0;
+
+    boxDiag.style.display = 'flex';
+
+    if (retencao === 0) {
+      document.getElementById('diagPerfilNome').textContent = "🎯 Dedução Identificada: Sem Retenções (Líquido = Bruto)";
+      document.getElementById('diagPerfilTexto').textContent = "O valor líquido é igual ao bruto. A nota fiscal não sofreu retenções na fonte.";
+      atualizarInterfacePorValores(bruto, 0, 0, 0, 0);
+      return;
+    }
+
+    let matchEncontrado = null;
+    for (const p of perfisFiscaisReversos) {
+      const v_ir = Math.round(bruto * p.irrf * 100) / 100;
+      const v_pc = Math.round(bruto * p.pcc * 100) / 100;
+      const v_is = Math.round(bruto * p.iss * 100) / 100;
+      const v_in = Math.round(bruto * p.inss * 100) / 100;
+      const totalSimulado = v_ir + v_pc + v_is + v_in;
+
+      if (Math.abs(totalSimulado - retencao) <= 0.04) {
+        matchEncontrado = { perfil: p, irrf: v_ir, pcc: v_pc, iss: v_is, inss: v_in };
+        break;
+      }
+    }
+
+    if (matchEncontrado) {
+      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: ${matchEncontrado.perfil.nome}`;
+      document.getElementById('diagPerfilTexto').innerHTML = `
+        Diferença exata de <strong>R$ ${fmtMoney(retencao)} (${pct.toFixed(2).replace('.', ',')}%)</strong>.<br>
+        ${matchEncontrado.perfil.desc}
+      `;
+      atualizarInterfacePorValores(bruto, matchEncontrado.iss, matchEncontrado.irrf, matchEncontrado.pcc, matchEncontrado.inss);
+    } else {
+      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: Retenção Personalizada (${pct.toFixed(2).replace('.', ',')}%)`;
+      document.getElementById('diagPerfilTexto').innerHTML = `
+        Diferença calculada de <strong>R$ ${fmtMoney(retencao)}</strong>. Pode se tratar de alíquota municipal específica de ISSQN, dedução de materiais ou retenção parcial.
+      `;
+      atualizarInterfacePorValores(bruto, retencao, 0, 0, 0);
+    }
+  }
+
+  function atualizarInterfacePorValores(bruto, vIss, vIrrf, vPcc, vInss) {
+    // Valores com 2 casas
+    document.getElementById('valRetIssqnMain').textContent = `R$ ${fmtMoney(vIss)}`;
+    document.getElementById('valRetIrrfMain').textContent = `R$ ${fmtMoney(vIrrf)}`;
+    document.getElementById('valRetPccMain').textContent = `R$ ${fmtMoney(vPcc)}`;
+    document.getElementById('valRetInssMain').textContent = `R$ ${fmtMoney(vInss)}`;
+
+    // Frações exatas de 4 a 5 casas
+    const exatoIss = (vIss > 0 && bruto > 0) ? (bruto * (aliqRetencoes.issqn || 5.0) / 100) : 0;
+    const exatoIrrf = (vIrrf > 0 && bruto > 0) ? (bruto * (aliqRetencoes.irrf || 1.5) / 100) : 0;
+    const exatoPcc = (vPcc > 0 && bruto > 0) ? (bruto * (aliqRetencoes.pcc || 4.65) / 100) : 0;
+    const exatoInss = (vInss > 0 && bruto > 0) ? (bruto * (aliqRetencoes.inss || 11.0) / 100) : 0;
+
+    document.getElementById('valRetIssqnFrac').textContent = `exato: ${fmtFrac(exatoIss)} 📋`;
+    document.getElementById('valRetIrrfFrac').textContent = `exato: ${fmtFrac(exatoIrrf)} 📋`;
+    document.getElementById('valRetPccFrac').textContent = `exato: ${fmtFrac(exatoPcc)} 📋`;
+    document.getElementById('valRetInssFrac').textContent = `exato: ${fmtFrac(exatoInss)} 📋`;
+
+    // PIS (0,65%), COFINS (3,00%) e CSLL (1,00%)
+    const vPis = vPcc > 0 ? (bruto * 0.0065) : 0;
+    const vCof = vPcc > 0 ? (bruto * 0.0300) : 0;
+    const vCsl = vPcc > 0 ? (bruto * 0.0100) : 0;
+
+    document.getElementById('fracPisVal').textContent = `R$ ${fmtMoney(vPis)} (ex: ${fmtFrac(vPis)}) 📋`;
+    document.getElementById('fracCofinsVal').textContent = `R$ ${fmtMoney(vCof)} (ex: ${fmtFrac(vCof)}) 📋`;
+    document.getElementById('fracCsllVal').textContent = `R$ ${fmtMoney(vCsl)} (ex: ${fmtFrac(vCsl)}) 📋`;
+
+    document.getElementById('chkIssqnRetido').checked = (vIss > 0);
+    document.getElementById('chkIrrfRetido').checked = (vIrrf > 0);
+    document.getElementById('chkPccRetido').checked = (vPcc > 0);
+    document.getElementById('chkInssRetido').checked = (vInss > 0);
+
+    document.getElementById('boxRetIssqn').classList.toggle('active', vIss > 0);
+    document.getElementById('boxRetIrrf').classList.toggle('active', vIrrf > 0);
+    document.getElementById('boxRetPcc').classList.toggle('active', vPcc > 0);
+    document.getElementById('boxRetInss').classList.toggle('active', vInss > 0);
+
+    const totalRet = vIss + vIrrf + vPcc + vInss;
+    const liquido = Math.max(0, bruto - totalRet);
+
+    document.getElementById('resumoBruto').textContent = `R$ ${fmtMoney(bruto)}`;
+    document.getElementById('resumoRetencoes').textContent = `R$ ${fmtMoney(totalRet)}`;
+    document.getElementById('resumoLiquido').textContent = `R$ ${fmtMoney(liquido)}`;
+  }
 
   function setAliqRet(tipo, valor, el) {
     aliqRetencoes[tipo] = valor;
@@ -1403,63 +1742,41 @@
     el.classList.add('active');
 
     const chk = document.getElementById(`chk${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Retido`);
-    if (chk) {
-      if (valor > 0) chk.checked = true;
-      else chk.checked = false;
-    }
-    calcularRetencoesServico();
+    if (chk) chk.checked = (valor > 0);
+
+    document.getElementById('boxDiagnosticoReverso').style.display = 'none';
+    document.getElementById('calcValorLiquidoInput').value = "";
+    recalcularModoDireto();
   }
 
-  function calcularRetencoesServico() {
-    const rawVal = document.getElementById('calcValorBruto').value.replace(/\./g, '').replace(',', '.');
-    const bruto = parseFloat(rawVal) || 0;
+  function aoMudarCheckboxManual() {
+    document.getElementById('boxDiagnosticoReverso').style.display = 'none';
+    document.getElementById('calcValorLiquidoInput').value = "";
+    recalcularModoDireto();
+  }
 
+  function recalcularModoDireto() {
+    const bruto = parseMoney(document.getElementById('calcValorBruto').value);
     const chkIss = document.getElementById('chkIssqnRetido').checked;
     const chkIrrf = document.getElementById('chkIrrfRetido').checked;
     const chkPcc = document.getElementById('chkPccRetido').checked;
     const chkInss = document.getElementById('chkInssRetido').checked;
 
-    const vIss = (chkIss && aliqRetencoes.issqn > 0) ? (bruto * (aliqRetencoes.issqn / 100)) : 0;
-    const vIrrf = (chkIrrf && aliqRetencoes.irrf > 0) ? (bruto * (aliqRetencoes.irrf / 100)) : 0;
-    const vPcc = (chkPcc && aliqRetencoes.pcc > 0) ? (bruto * (aliqRetencoes.pcc / 100)) : 0;
-    const vInss = (chkInss && aliqRetencoes.inss > 0) ? (bruto * (aliqRetencoes.inss / 100)) : 0;
+    const vIss = (chkIss && aliqRetencoes.issqn > 0) ? Math.round(bruto * (aliqRetencoes.issqn / 100) * 100) / 100 : 0;
+    const vIrrf = (chkIrrf && aliqRetencoes.irrf > 0) ? Math.round(bruto * (aliqRetencoes.irrf / 100) * 100) / 100 : 0;
+    const vPcc = (chkPcc && aliqRetencoes.pcc > 0) ? Math.round(bruto * (aliqRetencoes.pcc / 100) * 100) / 100 : 0;
+    const vInss = (chkInss && aliqRetencoes.inss > 0) ? Math.round(bruto * (aliqRetencoes.inss / 100) * 100) / 100 : 0;
 
-    const totalRetencoes = vIss + vIrrf + vPcc + vInss;
-    const liquido = Math.max(0, bruto - totalRetencoes);
-
-    // IBS / CBS Informativo da DANFSe v2.0 (calculado sobre a base líquida de deduções)
-    const baseIbsCbs = liquido;
-    const vIbs = baseIbsCbs * 0.0010; // 0,10%
-    const vCbs = baseIbsCbs * 0.0090; // 0,90%
-    const vTotalIbsCbs = vIbs + vCbs;
-
-    // Atualização de Valores na Tela
-    document.getElementById('valRetIssqn').textContent = vIss > 0 ? `- R$ ${vIss.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
-    document.getElementById('valRetIrrf').textContent = vIrrf > 0 ? `- R$ ${vIrrf.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
-    document.getElementById('valRetPcc').textContent = vPcc > 0 ? `- R$ ${vPcc.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
-    document.getElementById('valRetInss').textContent = vInss > 0 ? `- R$ ${vInss.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'R$ 0,00';
-
-    document.getElementById('boxRetIssqn').classList.toggle('active', vIss > 0);
-    document.getElementById('boxRetIrrf').classList.toggle('active', vIrrf > 0);
-    document.getElementById('boxRetPcc').classList.toggle('active', vPcc > 0);
-    document.getElementById('boxRetInss').classList.toggle('active', vInss > 0);
-
-    document.getElementById('valIbsInf').textContent = `R$ ${vIbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    document.getElementById('valCbsInf').textContent = `R$ ${vCbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    document.getElementById('valTotalIbsCbs').textContent = `Total: R$ ${vTotalIbsCbs.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-
-    document.getElementById('resumoBruto').textContent = `R$ ${bruto.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    document.getElementById('resumoRetencoes').textContent = `- R$ ${totalRetencoes.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    document.getElementById('resumoLiquido').textContent = `R$ ${liquido.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    atualizarInterfacePorValores(bruto, vIss, vIrrf, vPcc, vInss);
   }
 
   function copiarValorLiquido() {
     const el = document.getElementById('resumoLiquido');
-    let texto = el.textContent.replace('R$', '').trim();
+    let texto = extrairNumeroLimpo(el.innerText || el.textContent);
     navigator.clipboard.writeText(texto).then(() => {
       const orig = el.textContent;
-      el.textContent = "✓ Copiado!";
-      setTimeout(() => el.textContent = orig, 900);
+      el.textContent = `✓ Copiado (${texto})!`;
+      setTimeout(() => { el.textContent = orig; }, 900);
     });
   }
 
@@ -1581,14 +1898,12 @@
 
     elLimpa.textContent = chave;
 
-    // CASO 1: NFS-E PADRÃO NACIONAL (50 DÍGITOS)
+    // NFS-E PADRÃO NACIONAL (50 DÍGITOS)
     if (chave.length >= 50) {
       chave = chave.substring(0, 50);
       elLimpa.textContent = chave;
 
       const cMun = chave.substring(0, 7);
-      const tpAmb = chave.substring(7, 8);
-      const tpInsc = chave.substring(8, 9);
       const cnpjRaw = chave.substring(9, 23);
       const nNfsRaw = chave.substring(23, 36);
       const nDoc = parseInt(nNfsRaw, 10).toString();
@@ -1604,14 +1919,13 @@
       const ano = "20" + aamm.substring(0, 2);
       const mes = aamm.substring(2, 4);
 
-      // Localiza nome do município se disponível na base
       const munObj = listaCidades.find(m => m.c === cMun);
       const nomeMun = munObj ? munObj.n : `Mun ${cMun}`;
 
       elInfo.textContent = `${nomeMun}/${siglaUf} • ${mes}/${ano} • NFS-e Nacional`;
       if (btnPortal) btnPortal.textContent = "🔍 Portal NFS-e";
     }
-    // CASO 2: NF-E / CT-E / MDF-E (44 DÍGITOS)
+    // NF-E / CT-E / MDF-E (44 DÍGITOS)
     else if (chave.length >= 44) {
       chave = chave.substring(0, 44);
       elLimpa.textContent = chave;
@@ -1653,12 +1967,10 @@
     if (!chave) { alert("Cole a chave antes de consultar."); input.focus(); return; }
 
     navigator.clipboard.writeText(chave).then(() => {
-      // 50 dígitos: Portal Nacional da NFS-e
       if (chave.length >= 50) {
         window.open("https://www.nfse.gov.br/consultapublica", '_blank');
         return;
       }
-      // 44 dígitos: NF-e ou CT-e
       const mod = chave.length >= 22 ? chave.substring(20, 22) : "55";
       const urlSefaz = (mod === "57")
         ? "https://www.cte.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=cktLvUUKqh0="
@@ -1962,7 +2274,6 @@
     const statusText = document.getElementById('statusText');
     const offlineBanner = document.getElementById('offlineBanner');
 
-    // 1. Tenta carregar do Cache LocalStorage
     if (!forcar) {
       try {
         const cache = localStorage.getItem('ibge_base_v3');
@@ -1979,7 +2290,6 @@
       } catch (e) {}
     }
 
-    // 2. Se não há cache, ativa imediatamente a base offline interna
     if (listaCidades.length === 0) {
       listaCidades = baseOfflinePadrao.map(item => ({
         c: item.c,
@@ -1992,7 +2302,6 @@
       renderFavoritos();
     }
 
-    // 3. Baixa a base completa de 5.570 municípios do IBGE em segundo plano
     try {
       const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios");
       if (!res.ok) throw new Error("Erro HTTP");
@@ -2143,10 +2452,9 @@
     aplicarTema(salvo);
   } catch(e) { aplicarTema('dark'); }
 
-  try { carregarEstadosModulosSalvos(); } catch(e) { console.error(e); }
-  try { atualizarDescricaoCFOP('nfe'); atualizarDescricaoCFOP('cte'); } catch(e) { console.error(e); }
-  try { calcularRetencoesServico(); } catch(e) { console.error(e); }
-  try { carregarBaseIBGE(); } catch(e) { console.error(e); }
+  try { carregarEstadosModulosSalvos(); } catch(e) {}
+  try { atualizarDescricaoCFOP('nfe'); atualizarDescricaoCFOP('cte'); } catch(e) {}
+  try { carregarBaseIBGE(); } catch(e) {}
 </script>
 </body>
 </html>
