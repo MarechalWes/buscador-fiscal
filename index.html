@@ -200,7 +200,7 @@
     .depara-detail-lbl { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
     .depara-detail-val { font-size: 0.82rem; font-weight: 800; color: var(--text-title); font-family: Consolas, monospace; }
 
-    /* CALCULADORA DE RETENÇÕES */
+    /* MÓDULO CALCULADORA DE RETENÇÕES & DEDUÇÃO REVERSA */
     .calc-input-grid {
       display: grid;
       grid-template-columns: 330px 1fr;
@@ -691,10 +691,11 @@
                 </label>
               </div>
               <div class="ret-pills">
-                <span class="ret-pill active" onclick="setAliqRet('issqn', 0, this)">Isento</span>
-                <span class="ret-pill" onclick="setAliqRet('issqn', 2, this)">2%</span>
-                <span class="ret-pill" onclick="setAliqRet('issqn', 3, this)">3%</span>
-                <span class="ret-pill" onclick="setAliqRet('issqn', 5, this)">5%</span>
+                <span class="ret-pill active" data-val="0" onclick="setAliqRet('issqn', 0, this)">Isento</span>
+                <span class="ret-pill" data-val="2" onclick="setAliqRet('issqn', 2, this)">2%</span>
+                <span class="ret-pill" data-val="3" onclick="setAliqRet('issqn', 3, this)">3%</span>
+                <span class="ret-pill" data-val="4" onclick="setAliqRet('issqn', 4, this)">4%</span>
+                <span class="ret-pill" data-val="5" onclick="setAliqRet('issqn', 5, this)">5%</span>
               </div>
               <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetIssqnMain')" title="Clique para copiar valor positivo de 2 casas">
                 <div class="ret-val-main">
@@ -714,9 +715,9 @@
                 </label>
               </div>
               <div class="ret-pills">
-                <span class="ret-pill active" onclick="setAliqRet('irrf', 0, this)">Isento</span>
-                <span class="ret-pill" onclick="setAliqRet('irrf', 1.0, this)">1,0%</span>
-                <span class="ret-pill" onclick="setAliqRet('irrf', 1.5, this)">1,5%</span>
+                <span class="ret-pill active" data-val="0" onclick="setAliqRet('irrf', 0, this)">Isento</span>
+                <span class="ret-pill" data-val="1" onclick="setAliqRet('irrf', 1.0, this)">1,0%</span>
+                <span class="ret-pill" data-val="1.5" onclick="setAliqRet('irrf', 1.5, this)">1,5%</span>
               </div>
               <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetIrrfMain')" title="Clique para copiar valor positivo de 2 casas">
                 <div class="ret-val-main">
@@ -736,8 +737,8 @@
                 </label>
               </div>
               <div class="ret-pills">
-                <span class="ret-pill active" onclick="setAliqRet('pcc', 0, this)">Isento</span>
-                <span class="ret-pill" onclick="setAliqRet('pcc', 4.65, this)">4,65%</span>
+                <span class="ret-pill active" data-val="0" onclick="setAliqRet('pcc', 0, this)">Isento</span>
+                <span class="ret-pill" data-val="4.65" onclick="setAliqRet('pcc', 4.65, this)">4,65%</span>
               </div>
               <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetPccMain')" title="Clique para copiar total de PCC (2 casas)">
                 <div class="ret-val-main">
@@ -773,9 +774,9 @@
                 </label>
               </div>
               <div class="ret-pills">
-                <span class="ret-pill active" onclick="setAliqRet('inss', 0, this)">Isento</span>
-                <span class="ret-pill" onclick="setAliqRet('inss', 3.5, this)">3,5%</span>
-                <span class="ret-pill" onclick="setAliqRet('inss', 11.0, this)">11%</span>
+                <span class="ret-pill active" data-val="0" onclick="setAliqRet('inss', 0, this)">Isento</span>
+                <span class="ret-pill" data-val="3.5" onclick="setAliqRet('inss', 3.5, this)">3,5%</span>
+                <span class="ret-pill" data-val="11" onclick="setAliqRet('inss', 11.0, this)">11%</span>
               </div>
               <div class="ret-val-container" onclick="copiarValorAvulso(this, 'valRetInssMain')" title="Clique para copiar INSS (2 casas)">
                 <div class="ret-val-main">
@@ -1514,28 +1515,13 @@
     document.getElementById(`deparaComb_${id}`).textContent = "--";
   }
 
-  /* 5. CALCULADORA DE RETENÇÕES & ENGENHARIA REVERSA */
+  /* 5. CALCULADORA DE RETENÇÕES & DEDUÇÃO REVERSA COMBINATÓRIA */
   let aliqRetencoes = {
     issqn: 0.0,
     irrf: 0.0,
     pcc: 0.0,
     inss: 0.0
   };
-
-  const perfisFiscaisReversos = [
-    { nome: "Retenção Federal Padrão de 6,15% (IRRF 1,50% + PCC 4,65%)", desc: "Tributação Federal plena de serviços técnicos / profissionais (IRRF 1,50% + PIS 0,65% + COFINS 3,00% + CSLL 1,00%).", irrf: 0.015, pcc: 0.0465, iss: 0.0, inss: 0.0 },
-    { nome: "Federal Completo (6,15%) + ISSQN Retido (5,00%) = 11,15%", desc: "Retenção Federal integral somada à retenção municipal máxima de ISSQN (5%).", irrf: 0.015, pcc: 0.0465, iss: 0.05, inss: 0.0 },
-    { nome: "Federal Completo (6,15%) + ISSQN Retido (2,00%) = 8,15%", desc: "Retenção Federal integral somada ao ISSQN retido de 2% pelo tomador.", irrf: 0.015, pcc: 0.0465, iss: 0.02, inss: 0.0 },
-    { nome: "Federal Completo (6,15%) + ISSQN Retido (3,00%) = 9,15%", desc: "Retenção Federal integral somada ao ISSQN retido de 3% pelo tomador.", irrf: 0.015, pcc: 0.0465, iss: 0.03, inss: 0.0 },
-    { nome: "Apenas ISSQN Retido pelo Tomador (5,00%)", desc: "Retenção municipal de ISSQN a 5% (comum em fornecedores do Simples Nacional ou com dispensa federal).", irrf: 0.0, pcc: 0.0, iss: 0.05, inss: 0.0 },
-    { nome: "Apenas ISSQN Retido pelo Tomador (2,00%)", desc: "Retenção municipal de ISSQN na alíquota de 2% pelo tomador.", irrf: 0.0, pcc: 0.0, iss: 0.02, inss: 0.0 },
-    { nome: "Apenas ISSQN Retido pelo Tomador (3,00%)", desc: "Retenção municipal de ISSQN na alíquota de 3% pelo tomador.", irrf: 0.0, pcc: 0.0, iss: 0.03, inss: 0.0 },
-    { nome: "Apenas CSRF / PCC (4,65%)", desc: "Retenção de PIS (0,65%) + COFINS (3,00%) + CSLL (1,00%) sem retenção de IRRF.", irrf: 0.0, pcc: 0.0465, iss: 0.0, inss: 0.0 },
-    { nome: "Apenas IRRF Retido (1,50%)", desc: "Retenção na fonte exclusiva de Imposto de Renda de 1,5%.", irrf: 0.015, pcc: 0.0, iss: 0.0, inss: 0.0 },
-    { nome: "Apenas IRRF Retido (1,00%)", desc: "Retenção na fonte de IRRF de 1,0% (vigilância, limpeza, conservação).", irrf: 0.01, pcc: 0.0, iss: 0.0, inss: 0.0 },
-    { nome: "Apenas INSS Retido (11,00%)", desc: "Retenção previdenciária de 11% (cessão de mão de obra / empreitada).", irrf: 0.0, pcc: 0.0, iss: 0.0, inss: 0.11 },
-    { nome: "INSS (11%) + Retenção Federal Padrão (6,15%) = 17,15%", desc: "Retenção previdenciária de 11% somada à retenção federal completa.", irrf: 0.015, pcc: 0.0465, iss: 0.0, inss: 0.11 }
-  ];
 
   function parseMoney(valStr) {
     if (!valStr) return 0;
@@ -1611,18 +1597,15 @@
     document.getElementById('calcValorLiquidoInput').value = "";
     document.getElementById('boxDiagnosticoReverso').style.display = 'none';
     
-    // Zera alíquotas
     aliqRetencoes.issqn = 0;
     aliqRetencoes.irrf = 0;
     aliqRetencoes.pcc = 0;
     aliqRetencoes.inss = 0;
 
-    // Reseta pills
-    document.querySelectorAll('.ret-box').forEach(box => {
-      box.querySelectorAll('.ret-pill').forEach((p, idx) => {
-        p.classList.toggle('active', idx === 0);
-      });
-    });
+    atualizarPillsPorValor('issqn', 0);
+    atualizarPillsPorValor('irrf', 0);
+    atualizarPillsPorValor('pcc', 0);
+    atualizarPillsPorValor('inss', 0);
 
     recalcularModoDireto();
     document.getElementById('calcValorBruto').focus();
@@ -1637,6 +1620,21 @@
     }
   }
 
+  function atualizarPillsPorValor(tipo, valor) {
+    const box = document.getElementById(`boxRet${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+    if (!box) return;
+    const pills = box.querySelectorAll('.ret-pill');
+    pills.forEach(p => {
+      const pVal = parseFloat(p.getAttribute('data-val') || '0');
+      if (Math.abs(pVal - valor) < 0.01) {
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    });
+  }
+
+  /* MOTOR COMBINATÓRIO DE ENGENHARIA REVERSA */
   function executarEngenhariaReversa() {
     const bruto = parseMoney(document.getElementById('calcValorBruto').value);
     const liquido = parseMoney(document.getElementById('calcValorLiquidoInput').value);
@@ -1656,31 +1654,90 @@
     if (retencao === 0) {
       document.getElementById('diagPerfilNome').textContent = "🎯 Dedução Identificada: Sem Retenções (Líquido = Bruto)";
       document.getElementById('diagPerfilTexto').textContent = "O valor líquido é igual ao bruto. A nota fiscal não sofreu retenções na fonte.";
+      atualizarPillsPorValor('issqn', 0);
+      atualizarPillsPorValor('irrf', 0);
+      atualizarPillsPorValor('pcc', 0);
+      atualizarPillsPorValor('inss', 0);
       atualizarInterfacePorValores(bruto, 0, 0, 0, 0);
       return;
     }
 
-    let matchEncontrado = null;
-    for (const p of perfisFiscaisReversos) {
-      const v_ir = Math.round(bruto * p.irrf * 100) / 100;
-      const v_pc = Math.round(bruto * p.pcc * 100) / 100;
-      const v_is = Math.round(bruto * p.iss * 100) / 100;
-      const v_in = Math.round(bruto * p.inss * 100) / 100;
-      const totalSimulado = v_ir + v_pc + v_is + v_in;
+    // Busca combinatorial exata entre todas as combinações fiscais do Brasil
+    const irrf_opts = [0.0, 0.010, 0.015];
+    const pcc_opts = [0.0, 0.0465];
+    const inss_opts = [0.0, 0.035, 0.11];
+    const iss_opts = [0.0, 0.02, 0.03, 0.04, 0.05];
 
-      if (Math.abs(totalSimulado - retencao) <= 0.04) {
-        matchEncontrado = { perfil: p, irrf: v_ir, pcc: v_pc, iss: v_is, inss: v_in };
-        break;
+    let melhorMatch = null;
+    let menorDiff = 999999;
+
+    for (const ir of irrf_opts) {
+      for (const pc of pcc_opts) {
+        for (const inss of inss_opts) {
+          for (const iss of iss_opts) {
+            if (ir === 0 && pc === 0 && inss === 0 && iss === 0) continue;
+
+            const v_ir = Math.round(bruto * ir * 100) / 100;
+            const v_pi = pc > 0 ? Math.round(bruto * 0.0065 * 100) / 100 : 0;
+            const v_co = pc > 0 ? Math.round(bruto * 0.0300 * 100) / 100 : 0;
+            const v_cs = pc > 0 ? Math.round(bruto * 0.0100 * 100) / 100 : 0;
+            const v_pc = v_pi + v_co + v_cs;
+            const v_in = Math.round(bruto * inss * 100) / 100;
+            const v_is = Math.round(bruto * iss * 100) / 100;
+            const totalSimulado = v_ir + v_pc + v_in + v_is;
+
+            const diff = Math.abs(totalSimulado - retencao);
+            if (diff < menorDiff && diff <= 0.05) {
+              menorDiff = diff;
+              
+              const partes = [];
+              if (ir > 0) partes.append ? null : partes.push(`IRRF ${(ir*100).toFixed(1).replace('.0', '')}%`);
+              if (pc > 0) partes.push("PCC 4,65%");
+              if (inss > 0) partes.push(`INSS ${(inss*100).toFixed(1).replace('.0', '')}%`);
+              if (iss > 0) partes.push(`ISSQN ${(iss*100).toFixed(0)}%`);
+
+              const aliqTotal = (ir + pc + inss + iss) * 100;
+              const titulo = `Retenção de ${aliqTotal.toFixed(2).replace('.', ',')}% (${partes.join(' + ')})`;
+
+              let desc = "Retenção apurada por decomposição tributária oficial.";
+              if (inss > 0 && ir === 0.01) {
+                desc = "Fornecimento / cessão de mão de obra (IRRF 1%, INSS 11% e contribuições sociais).";
+              } else if (ir === 0.015 && pc > 0 && inss === 0 && iss === 0) {
+                desc = "Tributação Federal plena de serviços técnicos / profissionais.";
+              } else if (iss > 0 && ir === 0 && pc === 0 && inss === 0) {
+                desc = "Retenção municipal exclusiva de ISSQN pelo tomador de serviço.";
+              }
+
+              melhorMatch = {
+                titulo: `🎯 Dedução Identificada: ${titulo}`,
+                desc: `Diferença exata de <strong>R$ ${fmtMoney(retencao)} (${pct.toFixed(2).replace('.', ',')}%)</strong>.<br>${desc}`,
+                irrf_rate: ir * 100,
+                pcc_rate: pc * 100,
+                inss_rate: inss * 100,
+                iss_rate: iss * 100,
+                v_ir, v_pc, v_in, v_is
+              };
+            }
+          }
+        }
       }
     }
 
-    if (matchEncontrado) {
-      document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: ${matchEncontrado.perfil.nome}`;
-      document.getElementById('diagPerfilTexto').innerHTML = `
-        Diferença exata de <strong>R$ ${fmtMoney(retencao)} (${pct.toFixed(2).replace('.', ',')}%)</strong>.<br>
-        ${matchEncontrado.perfil.desc}
-      `;
-      atualizarInterfacePorValores(bruto, matchEncontrado.iss, matchEncontrado.irrf, matchEncontrado.pcc, matchEncontrado.inss);
+    if (melhorMatch) {
+      document.getElementById('diagPerfilNome').textContent = melhorMatch.titulo;
+      document.getElementById('diagPerfilTexto').innerHTML = melhorMatch.desc;
+
+      aliqRetencoes.issqn = melhorMatch.iss_rate;
+      aliqRetencoes.irrf = melhorMatch.irrf_rate;
+      aliqRetencoes.pcc = melhorMatch.pcc_rate;
+      aliqRetencoes.inss = melhorMatch.inss_rate;
+
+      atualizarPillsPorValor('issqn', melhorMatch.iss_rate);
+      atualizarPillsPorValor('irrf', melhorMatch.irrf_rate);
+      atualizarPillsPorValor('pcc', melhorMatch.pcc_rate);
+      atualizarPillsPorValor('inss', melhorMatch.inss_rate);
+
+      atualizarInterfacePorValores(bruto, melhorMatch.v_is, melhorMatch.v_ir, melhorMatch.v_pc, melhorMatch.v_in);
     } else {
       document.getElementById('diagPerfilNome').textContent = `🎯 Dedução Identificada: Retenção Personalizada (${pct.toFixed(2).replace('.', ',')}%)`;
       document.getElementById('diagPerfilTexto').innerHTML = `
@@ -1691,13 +1748,11 @@
   }
 
   function atualizarInterfacePorValores(bruto, vIss, vIrrf, vPcc, vInss) {
-    // Valores com 2 casas
     document.getElementById('valRetIssqnMain').textContent = `R$ ${fmtMoney(vIss)}`;
     document.getElementById('valRetIrrfMain').textContent = `R$ ${fmtMoney(vIrrf)}`;
     document.getElementById('valRetPccMain').textContent = `R$ ${fmtMoney(vPcc)}`;
     document.getElementById('valRetInssMain').textContent = `R$ ${fmtMoney(vInss)}`;
 
-    // Frações exatas de 4 a 5 casas
     const exatoIss = (vIss > 0 && bruto > 0) ? (bruto * (aliqRetencoes.issqn || 5.0) / 100) : 0;
     const exatoIrrf = (vIrrf > 0 && bruto > 0) ? (bruto * (aliqRetencoes.irrf || 1.5) / 100) : 0;
     const exatoPcc = (vPcc > 0 && bruto > 0) ? (bruto * (aliqRetencoes.pcc || 4.65) / 100) : 0;
@@ -1708,7 +1763,6 @@
     document.getElementById('valRetPccFrac').textContent = `exato: ${fmtFrac(exatoPcc)} 📋`;
     document.getElementById('valRetInssFrac').textContent = `exato: ${fmtFrac(exatoInss)} 📋`;
 
-    // PIS (0,65%), COFINS (3,00%) e CSLL (1,00%)
     const vPis = vPcc > 0 ? (bruto * 0.0065) : 0;
     const vCof = vPcc > 0 ? (bruto * 0.0300) : 0;
     const vCsl = vPcc > 0 ? (bruto * 0.0100) : 0;
@@ -2274,6 +2328,7 @@
     const statusText = document.getElementById('statusText');
     const offlineBanner = document.getElementById('offlineBanner');
 
+    // 1. Tenta carregar do Cache LocalStorage
     if (!forcar) {
       try {
         const cache = localStorage.getItem('ibge_base_v3');
@@ -2290,6 +2345,7 @@
       } catch (e) {}
     }
 
+    // 2. Base offline interna de prontidão
     if (listaCidades.length === 0) {
       listaCidades = baseOfflinePadrao.map(item => ({
         c: item.c,
@@ -2302,6 +2358,7 @@
       renderFavoritos();
     }
 
+    // 3. Download completo do IBGE em segundo plano
     try {
       const res = await fetch("https://servicodados.ibge.gov.br/api/v1/localidades/municipios");
       if (!res.ok) throw new Error("Erro HTTP");
